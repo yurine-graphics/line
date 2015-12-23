@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>radio</title>
+  <meta name="viewport" content="target-densitydpi=device-dpi,width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=0"/>
+  <style>
+    html,body{
+      font:12px/1.5 Arial;
+    }
+    a{
+      text-decoration:none;
+      color:#F33;
+    }
+    ul{
+      padding:0;
+      list-style-type:none;
+    }
+    ul li{
+      padding:2px 0;
+    }
+    ul input{
+      width:100px;
+    }
+    ul button{
+      display:inline-block;
+      width:50px;
+      height:20px;
+      margin:0;
+      padding:0;
+      background:#FFF;
+      border:1px solid #EEE;
+    }
+    form>button,#sub{
+      display:inline-block;
+      padding:0;
+      width:100px;
+      height:30px;
+      background:#FED;
+      font-size:14px;
+      border:1px solid #CBA;
+      border-radius:3px;
+    }
+  </style>
+</head>
+<body>
+<canvas id="canvas" width="600" height="300" style="width:300px;height:150px;"></canvas>
+<form>
+  <ul>
+  </ul>
+  <input type="submit" id="sub"/>
+  <button id="add">添加</button>
+</form>
+<script src="sea.js"></script>
+<script>
+  seajs.use('../init', function(Radio) {
+    var search = location.search || '';
+    search = search.replace(/^\?/, '');
+    var data = [];
+    if(search) {
+      data = JSON.parse(decodeURIComponent(search));
+    }
+    if(!data.length) {
+      data = [
+        ['默认a', 72],
+        ['默认b', 53],
+        ['默认c', 26],
+        ['默认d', 39]
+      ];
+    }
+    for(var i = 0; i < data.length; i++) {
+      var item = data[i];
+      if(!item[0] || !item[1]) {
+        data.splice(i, 1);
+        i--;
+      }
+    }
+    var s = '';
+    data.forEach(function(item) {
+      s += '<li>\
+        <input type="text" value="' + item[0] + '" placeholder="名称"/>\
+        <input type="number" value="' + item[1] + '" placeholder="数字"/>\
+        <button>删除</button>\
+        </li>';
+    });
+    var ul = document.querySelector('ul');
+    ul.innerHTML = s;
+    ul.addEventListener('click', function(e) {
+      e = e || window.event;
+      if(e.target.nodeName == 'BUTTON') {
+        var li = e.target.parentNode;
+        ul.removeChild(li);
+        cb();
+      }
+    });
+
+    var form = document.querySelector('form');
+    function cb() {
+      var data = [];
+      var inputs = form.querySelectorAll('input');
+      for(var i = 0, len = inputs.length; i < len - 1; i += 2) {
+        data.push([
+          inputs[i].value,
+          parseInt(inputs[i + 1].value) || 1
+        ]);
+      }
+      location.href = '?' + encodeURIComponent(JSON.stringify(data));
+    }
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      cb();
+    });
+    var add = document.querySelector('#add');
+    add.addEventListener('click', function(e) {
+      e.preventDefault();
+      ul.innerHTML += '<li>\
+        <input type="text" value="" placeholder="名称"/>\
+        <input type="number" value="" placeholder="数字"/>\
+        <button>删除</button>\
+        </li>';
+    });
+    new Radio('#canvas', data, {
+      width: 600,
+      height: 300,
+      fontSize: 24,
+      lineWidth: 30
+    });
+  });
+</script>
+</body>
+</html>
