@@ -147,10 +147,18 @@ class Line {
       yNum = self.data.length;
     }
 
-    var [left, top] = self.renderBg(context, padding, width, height, gridWidth, max, min, lineHeight, fontSize, xNum, yNum);
-    self.renderFg(context, padding, width, height, lineWidth, left, top);
+    var stepV;
+    if(max >= 0 && min >= 0 || max < 0 && min < 0) {
+      stepV = Math.abs(max - min) / (yNum - 1);
+    }
+    else {
+      stepV = Math.abs(max + min) / (yNum - 1);
+    }
+
+    var [left, bottom, stepX, stepY] = self.renderBg(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV);
+    self.renderFg(context, padding, width, height, lineWidth, left, bottom, stepX, stepY, stepV);
   }
-  renderBg(context, padding, width, height, gridWidth, max, min, lineHeight, fontSize, xNum, yNum) {
+  renderBg(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV) {
     var color = this.option.color || '#000';
     if(color.charAt(0) != '#' && color.charAt(0) != 'r') {
       color = '#' + color;
@@ -166,7 +174,8 @@ class Line {
     var stepY = height - padding[0] - padding[2] - lineHeight * 2 - 10;
     stepY /= yNum - 1;
 
-    var left = this.renderY(context, padding, width, height, yNum, lineHeight, max, min, stepY, fontSize);
+    var bottom = padding[2] + lineHeight * 1.5 + 10;
+    var left = this.renderY(context, padding, width, height, yNum, min, stepY, fontSize, stepV, bottom);
 
     var offsetX1 = context.measureText(this.data[0][0]).width >> 1;
     var offsetX2 = context.measureText(this.data[this.data.length - 1][0]).width >> 1;
@@ -176,31 +185,22 @@ class Line {
 
     this.renderX(context, padding, height, lineHeight, left, stepX);
 
-    var top = padding[0] + ((lineHeight - fontSize) >> 1);
-    return [left, top];
+    return [left, bottom, stepX, stepY];
   }
-  renderY(context, padding, width, height, yNum, lineHeight, max, min, step, fontSize) {
-    var diff;
-    if(max >= 0 && min >= 0 || max < 0 && min < 0) {
-      diff = Math.abs(max - min) / (yNum - 1);
-    }
-    else {
-      diff = Math.abs(max + min) / (yNum - 1);
-    }
-
+  renderY(context, padding, width, height, yNum, min, step, fontSize, stepV, bottom) {
     var left = 0;
     var x = padding[3];
 
     for(var i = 0; i < yNum; i++) {
-      var y = height - step * i - padding[2] - lineHeight * 2 + ((lineHeight - fontSize) >> 1) - 10;
-      var v = String((min + i * diff).toFixed(2));
+      var y = height - step * i - bottom - (fontSize >> 1);
+      var v = String((min + i * stepV).toFixed(2));
       v = v.replace(/\.00$/, '');
       left = Math.max(left, context.measureText(v).width);
       context.fillText(v, x, y);
     }
     left += 10;
     for(var i = 0; i < yNum; i++) {
-      var y = height - step * i - padding[2] - lineHeight * 1.5 - 10;
+      var y = height - step * i - bottom;
       context.beginPath();
       context.moveTo(x + left, y);
       context.lineTo(width - padding[1], y);
@@ -225,8 +225,6 @@ class Line {
       context.lineTo(x, height - padding[2] - lineHeight - 10);
       context.stroke();
     });
-
-    return lineHeight + 10;
   }
   renderXItem(item, context, padding, height, lineHeight, x) {
     var txt = item[0];
@@ -234,7 +232,11 @@ class Line {
     context.fillText(txt, x - (w >> 1), height - lineHeight - padding[2]);
     return w;
   }
-  renderFg(context, padding, width, height, lineWidth, left, top) {
+  renderFg(context, padding, width, height, lineWidth, left, top, stepX, stepY, stepV) {
+    var coords = [];
+    for(var i = 0, len = this.data.length; i < len; i++) {
+      coords.push([left + i * stepX]);
+    }
     var centers = [];
     for(var i = 0, len = this.data.length; i < len - 1; i++) {
       var item1 = this.data[i];
@@ -242,7 +244,6 @@ class Line {
       if(!item1 || !item2 || isNaN(item1[1]) || isNaN(item2[1])) {
         centers.push(null);
       }
-      var x = Math.sqrt()
     }
   }
 }

@@ -33,7 +33,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
   }
 
   Line.prototype.render = function() {
-    var top;var left;var lineHeight;var fontSize;var fontWeight;var fontFamily;var fontVariant;var fontStyle;var self = this;
+    var stepY;var stepX;var bottom;var left;var lineHeight;var fontSize;var fontWeight;var fontFamily;var fontVariant;var fontStyle;var self = this;
     var context = self.dom.getContext('2d');
     var width = self.option.width || 300;
     var height = self.option.height || 150;
@@ -147,10 +147,18 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
       yNum = self.data.length;
     }
 
-    !function(){var _2= self.renderBg(context, padding, width, height, gridWidth, max, min, lineHeight, fontSize, xNum, yNum);left=_2[0];top=_2[1]}();
-    self.renderFg(context, padding, width, height, lineWidth, left, top);
+    var stepV;
+    if(max >= 0 && min >= 0 || max < 0 && min < 0) {
+      stepV = Math.abs(max - min) / (yNum - 1);
+    }
+    else {
+      stepV = Math.abs(max + min) / (yNum - 1);
+    }
+
+    !function(){var _2= self.renderBg(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV);left=_2[0];bottom=_2[1];stepX=_2[2];stepY=_2[3]}();
+    self.renderFg(context, padding, width, height, lineWidth, left, bottom, stepX, stepY, stepV);
   }
-  Line.prototype.renderBg = function(context, padding, width, height, gridWidth, max, min, lineHeight, fontSize, xNum, yNum) {
+  Line.prototype.renderBg = function(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV) {
     var color = this.option.color || '#000';
     if(color.charAt(0) != '#' && color.charAt(0) != 'r') {
       color = '#' + color;
@@ -166,7 +174,8 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     var stepY = height - padding[0] - padding[2] - lineHeight * 2 - 10;
     stepY /= yNum - 1;
 
-    var left = this.renderY(context, padding, width, height, yNum, lineHeight, max, min, stepY, fontSize);
+    var bottom = padding[2] + lineHeight * 1.5 + 10;
+    var left = this.renderY(context, padding, width, height, yNum, min, stepY, fontSize, stepV, bottom);
 
     var offsetX1 = context.measureText(this.data[0][0]).width >> 1;
     var offsetX2 = context.measureText(this.data[this.data.length - 1][0]).width >> 1;
@@ -176,31 +185,22 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
 
     this.renderX(context, padding, height, lineHeight, left, stepX);
 
-    var top = padding[0] + ((lineHeight - fontSize) >> 1);
-    return [left, top];
+    return [left, bottom, stepX, stepY];
   }
-  Line.prototype.renderY = function(context, padding, width, height, yNum, lineHeight, max, min, step, fontSize) {
-    var diff;
-    if(max >= 0 && min >= 0 || max < 0 && min < 0) {
-      diff = Math.abs(max - min) / (yNum - 1);
-    }
-    else {
-      diff = Math.abs(max + min) / (yNum - 1);
-    }
-
+  Line.prototype.renderY = function(context, padding, width, height, yNum, min, step, fontSize, stepV, bottom) {
     var left = 0;
     var x = padding[3];
 
     for(var i = 0; i < yNum; i++) {
-      var y = height - step * i - padding[2] - lineHeight * 2 + ((lineHeight - fontSize) >> 1) - 10;
-      var v = String((min + i * diff).toFixed(2));
+      var y = height - step * i - bottom - (fontSize >> 1);
+      var v = String((min + i * stepV).toFixed(2));
       v = v.replace(/\.00$/, '');
       left = Math.max(left, context.measureText(v).width);
       context.fillText(v, x, y);
     }
     left += 10;
     for(var i = 0; i < yNum; i++) {
-      var y = height - step * i - padding[2] - lineHeight * 1.5 - 10;
+      var y = height - step * i - bottom;
       context.beginPath();
       context.moveTo(x + left, y);
       context.lineTo(width - padding[1], y);
@@ -225,8 +225,6 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
       context.lineTo(x, height - padding[2] - lineHeight - 10);
       context.stroke();
     });
-
-    return lineHeight + 10;
   }
   Line.prototype.renderXItem = function(item, context, padding, height, lineHeight, x) {
     var txt = item[0];
@@ -234,7 +232,11 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     context.fillText(txt, x - (w >> 1), height - lineHeight - padding[2]);
     return w;
   }
-  Line.prototype.renderFg = function(context, padding, width, height, lineWidth, left, top) {
+  Line.prototype.renderFg = function(context, padding, width, height, lineWidth, left, top, stepX, stepY, stepV) {
+    var coords = [];
+    for(var i = 0, len = this.data.length; i < len; i++) {
+      coords.push([left + i * stepX]);
+    }
     var centers = [];
     for(var i = 0, len = this.data.length; i < len - 1; i++) {
       var item1 = this.data[i];
@@ -242,7 +244,6 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
       if(!item1 || !item2 || isNaN(item1[1]) || isNaN(item2[1])) {
         centers.push(null);
       }
-      var x = Math.sqrt()
     }
   }
 
