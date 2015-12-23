@@ -156,7 +156,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     }
 
     !function(){var _2= self.renderBg(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV);left=_2[0];bottom=_2[1];stepX=_2[2];stepY=_2[3]}();
-    self.renderFg(context, padding, width, height, lineWidth, left, bottom, stepX, stepY, stepV);
+    self.renderFg(context, padding, width, height, lineHeight, lineWidth, left, bottom, stepX, stepY, stepV, min, minAbs);
   }
   Line.prototype.renderBg = function(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV) {
     var color = this.option.color || '#000';
@@ -194,15 +194,20 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     for(var i = 0; i < yNum; i++) {
       var y = height - step * i - bottom - (fontSize >> 1);
       var v = String((min + i * stepV).toFixed(2));
-      v = v.replace(/\.00$/, '');
+      if(/\.0*$/.test(v)) {
+        v = v.replace(/\.0*/, '');
+      }
+      else if(/\./.test(v)) {
+        v = v.replace(/\.([\d]*?)0$/, '.$1');
+      }
       left = Math.max(left, context.measureText(v).width);
       context.fillText(v, x, y);
     }
-    left += 10;
+    left += 10 + x;
     for(var i = 0; i < yNum; i++) {
       var y = height - step * i - bottom;
       context.beginPath();
-      context.moveTo(x + left, y);
+      context.moveTo(left, y);
       context.lineTo(width - padding[1], y);
       context.stroke();
     }
@@ -218,7 +223,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     var self = this;
 
     self.data.forEach(function(item, i) {
-      var x = left + i * step + padding[3];
+      var x = left + i * step;
       self.renderXItem(item, context, padding, height, lineHeight, x);
       context.beginPath();
       context.moveTo(x, padding[0]);
@@ -232,10 +237,27 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     context.fillText(txt, x - (w >> 1), height - lineHeight - padding[2]);
     return w;
   }
-  Line.prototype.renderFg = function(context, padding, width, height, lineWidth, left, top, stepX, stepY, stepV) {
+  Line.prototype.renderFg = function(context, padding, width, height, lineHeight, lineWidth, left, bottom, stepX, stepY, stepV, min, minAbs) {
+    var self = this;
     var coords = [];
-    for(var i = 0, len = this.data.length; i < len; i++) {
-      coords.push([left + i * stepX]);
+    for(var i = 0, len = self.data.length; i < len; i++) {
+      var v = self.data[i][1];
+      var x = left + i * stepX;
+      var y = height - bottom - (v - min) * stepY / stepV;
+      coords.push([x, y]);
+    }
+    if(self.option.discRadio) {
+      var discRadio = parseInt(self.option.discRadio) || 10;
+      discRadio = Math.max(discRadio, 1);
+      discRadio = Math.min(discRadio, lineHeight >> 1);
+      coords.forEach(function(item, i) {
+        var color = getColor(self.option, i);
+        context.fillStyle = color;
+        context.beginPath();
+        context.arc(item[0], item[1], discRadio, 0, (Math.PI/180)*360);
+        context.fill();
+        context.closePath();
+      });
     }
     var centers = [];
     for(var i = 0, len = this.data.length; i < len - 1; i++) {
