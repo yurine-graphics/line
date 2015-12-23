@@ -62,7 +62,8 @@ class Line {
     var paddingX = padding[1] + padding[3];
     var paddingY = padding[0] + padding[2];
     var min = Math.min(width - paddingX, height - paddingY);
-    var lineWidth = this.option.lineWidth || 2;
+
+    var lineWidth = this.option.lineWidth || 1;
     if(lineWidth < 1) {
       lineWidth = 1;
     }
@@ -70,10 +71,41 @@ class Line {
       lineWidth = min >> 2;
     }
 
-    this.renderBg(context, padding, width, height);
-    //this.renderFg(context, lineWidth);
+    var gridWidth = this.option.gridWidth || 1;
+    if(gridWidth < 1) {
+      gridWidth = 1;
+    }
+    else if(gridWidth > min >> 2) {
+      gridWidth = min >> 2;
+    }
+
+    var count = 0;
+    var max = parseFloat(this.data[0][1]) || 0;
+    var min = parseFloat(this.data[0][1]) || 0;
+    var minAbs = Math.abs(min);
+    this.data.forEach(function(item) {
+      var v = parseFloat(item[1]) || 0;
+      max = Math.max(max, v);
+      min = Math.min(min, v);
+    });
+    this.data.forEach(function(item) {
+      var v = parseFloat(item[1]) || 0;
+      //所有均加|min|，防止负数干扰方差计算
+      count += v + minAbs;
+    });
+    var yBar = count / this.data.length;
+    var yDev = 0;
+    this.data.forEach(function(item) {
+      var v = parseFloat(item[1]) || 0;
+      yDev += Math.pow(v + minAbs - yBar, 2);
+    });
+    count -= minAbs * this.data.length;
+    yBar -= minAbs;
+
+    this.renderBg(context, padding, width, height, gridWidth, max, min);
+    this.renderFg(context, padding, width, height, lineWidth);
   }
-  renderBg(context, padding, width, height) {
+  renderBg(context, padding, width, height, gridWidth, max, min) {
     var self = this;
     var font = self.option.font || 'normal normal normal 12px/1.5 Arial';
     var { fontStyle, fontVariant, fontFamily, fontWeight, fontSize, lineHeight } = util.calFont(font);
@@ -107,57 +139,32 @@ class Line {
     font = fontStyle + ' ' + fontVariant + ' ' + fontWeight + ' ' + fontSize + 'px/' + lineHeight + 'px ' + fontFamily;
     context.font = font;
 
-    var color = self.option.color || '#000';
-    if(color.charAt(0) != '#' && color.charAt(0) != 'r') {
-      color = '#' + color;
-    }
-
-    var xNum = parseInt(this.option.xNum) || this.data.length;
+    var xNum = parseInt(self.option.xNum) || self.data.length;
     if(xNum < 1) {
       xNum = 1;
     }
-    else if(xNum > this.data.length) {
-      xNum = this.data.length;
+    else if(xNum > self.data.length) {
+      xNum = self.data.length;
     }
-    var yNum = parseInt(this.option.yNum) || Math.floor((height - padding[0] - padding[2] - lineHeight * 2 - 20) / lineHeight * 2);
+    var yNum = parseInt(self.option.yNum) || Math.floor((height - padding[0] - padding[2] - lineHeight * 2 - 20) / lineHeight * 2);
     if(yNum < 1) {
       yNum = 1;
     }
-    else if(yNum > this.data.length) {
-      yNum = this.data.length;
+    else if(yNum > self.data.length) {
+      yNum = self.data.length;
     }
 
-    var count = 0;
-    var max = parseFloat(self.data[0][1]) || 0;
-    var min = parseFloat(self.data[0][1]) || 0;
-    var minAbs = Math.abs(min);
-    self.data.forEach(function(item) {
-      var v = parseFloat(item[1]) || 0;
-      max = Math.max(max, v);
-      min = Math.min(min, v);
-    });
-    self.data.forEach(function(item) {
-      var v = parseFloat(item[1]) || 0;
-      //所有均加|min|，防止负数干扰方差计算
-      count += v + minAbs;
-    });
-    var yBar = count / self.data.length;
-    var yDev = 0;
-    self.data.forEach(function(item) {
-      var v = parseFloat(item[1]) || 0;
-      yDev += Math.pow(v + minAbs - yBar, 2);
-    });
-    count -= minAbs * self.data.length;
-    yBar -= minAbs;
-
-    var self = this;
     var color = self.option.color || '#000';
     if(color.charAt(0) != '#' && color.charAt(0) != 'r') {
       color = '#' + color;
     }
+    var gridColor = self.option.gridColor || 'rgba(0, 0, 0, 0.2)';
+    if(gridColor.charAt(0) != '#' && gridColor.charAt(0) != 'r') {
+      gridColor = '#' + gridColor;
+    }
     context.fillStyle = color;
-    context.lineWidth = 1;
-    context.strokeStyle = 'rgba(0, 0, 0, 0.2)';
+    context.lineWidth = gridWidth;
+    context.strokeStyle = gridColor;
 
     var left = self.renderY(context, padding, width, height, yNum, lineHeight, max, min, fontSize);
     self.renderX(context, padding, width, height, xNum, lineHeight, left);
@@ -221,7 +228,7 @@ class Line {
     context.fillText(txt, x - (w >> 1), height - lineHeight - padding[2]);
     return w;
   }
-  renderFg(context, lineWidth) {
+  renderFg(context, padding, width, height, lineWidth) {
   }
 }
 
