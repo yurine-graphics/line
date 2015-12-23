@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>radio</title>
+  <title>line</title>
   <meta name="viewport" content="target-densitydpi=device-dpi,width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=0"/>
   <style>
     html,body{
@@ -53,7 +53,7 @@
 </form>
 <script src="sea.js"></script>
 <script>
-  seajs.use('../init', function(Radio) {
+  seajs.use('../init', function(Line) {
     var search = location.search || '';
     search = search.replace(/^\?/, '');
     var data = [];
@@ -62,18 +62,11 @@
     }
     if(!data.length) {
       data = [
-        ['默认a', 72],
-        ['默认b', 53],
-        ['默认c', 26],
-        ['默认d', 39]
+        ['默认a', 1],
+        ['默认bsdfasdfas', 2],
+        ['默认c', 3],
+        ['默认d', 4]
       ];
-    }
-    for(var i = 0; i < data.length; i++) {
-      var item = data[i];
-      if(!item[0] || !item[1]) {
-        data.splice(i, 1);
-        i--;
-      }
     }
     var s = '';
     data.forEach(function(item) {
@@ -101,7 +94,7 @@
       for(var i = 0, len = inputs.length; i < len - 1; i += 2) {
         data.push([
           inputs[i].value,
-          parseInt(inputs[i + 1].value) || 1
+          parseInt(inputs[i + 1].value) || undefined
         ]);
       }
       location.href = '?' + encodeURIComponent(JSON.stringify(data));
@@ -119,11 +112,11 @@
         <button>删除</button>\
         </li>';
     });
-    new Radio('#canvas', data, {
+    new Line('#canvas', data, {
       width: 600,
       height: 300,
       fontSize: 24,
-      lineWidth: 30
+      lineWidth: 2
     });
   });
 </script>

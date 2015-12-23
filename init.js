@@ -1,3 +1,3 @@
 define(function(require, exports, module) {
-  module.exports = require('./web/Radio')['default'];
+  module.exports = require('./web/Line')['default'];
 });
