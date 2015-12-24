@@ -56,20 +56,19 @@
   seajs.use('../init', function(Line) {
     var search = location.search || '';
     search = search.replace(/^\?/, '');
-    var data = [];
+    var data = {
+      label: ['默认a', '默认b', '默认c', '默认d'],
+      value: [
+        [1, 2, 3, 5]
+      ]
+    };
     if(search) {
       data = JSON.parse(decodeURIComponent(search));
     }
-    if(!data.length) {
-      data = [
-        ['默认a', 1],
-        ['默认b', 2],
-        ['默认c', 3],
-        ['默认d', 4.5]
-      ];
-    }
+    data.label = data.label || ['默认a', '默认b', '默认c', '默认d'];
+    data.value = data.value || [1, 2, 3, 5];
     var s = '';
-    data.forEach(function(item) {
+    data.label.forEach(function(item) {
       s += '<li>\
         <input type="text" value="' + item[0] + '" placeholder="名称"/>\
         <input type="number" value="' + item[1] + '" placeholder="数字"/>\
