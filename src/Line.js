@@ -137,13 +137,7 @@ class Line {
       yNum = self.data.value[0].length;
     }
 
-    var stepV;
-    if(max >= 0 && min >= 0 || max < 0 && min < 0) {
-      stepV = Math.abs(max - min) / (yNum - 1);
-    }
-    else {
-      stepV = Math.abs(max + min) / (yNum - 1);
-    }
+    var stepV = stepV = Math.abs(max - min) / (yNum - 1);
 
     var [left, bottom, stepX, stepY, increase] = self.renderBg(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV);
     self.renderFg(context, height, lineHeight, lineWidth, left, bottom, stepX, stepY, stepV, min, increase);

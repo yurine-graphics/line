@@ -137,13 +137,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
       yNum = self.data.value[0].length;
     }
 
-    var stepV;
-    if(max >= 0 && min >= 0 || max < 0 && min < 0) {
-      stepV = Math.abs(max - min) / (yNum - 1);
-    }
-    else {
-      stepV = Math.abs(max + min) / (yNum - 1);
-    }
+    var stepV = stepV = Math.abs(max - min) / (yNum - 1);
 
     !function(){var _2= self.renderBg(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV);left=_2[0];bottom=_2[1];stepX=_2[2];stepY=_2[3];increase=_2[4]}();
     self.renderFg(context, height, lineHeight, lineWidth, left, bottom, stepX, stepY, stepV, min, increase);
