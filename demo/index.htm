@@ -48,6 +48,8 @@
     search.discRadio = search.discRadio || 0;
     search.xNum = search.xNum || 4;
     search.yNum = search.yNum || 4;
+    search.lineWidth = search.lineWidth || 1;
+    search.gridWidth = search.gridWidth || 1;
 
     var textarea = document.querySelector('textarea');
     textarea.value = JSON.stringify(search, null, '  ');
@@ -69,7 +71,9 @@
       styles: search.style,
       curvature: search.curvature,
       xNum: search.xNum,
-      yNum: search.yNum
+      yNum: search.yNum,
+      gridWidth: search.gridWidth,
+      lineWidth: search.lineWidth
     });
   });
 </script>
