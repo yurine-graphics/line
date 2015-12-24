@@ -37,7 +37,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
   }
 
   Line.prototype.render = function() {
-    var stepY;var stepX;var bottom;var left;var lineHeight;var fontSize;var fontWeight;var fontFamily;var fontVariant;var fontStyle;var self = this;
+    var increase;var stepY;var stepX;var bottom;var left;var lineHeight;var fontSize;var fontWeight;var fontFamily;var fontVariant;var fontStyle;var self = this;
     var context = self.dom.getContext('2d');
     var width = self.option.width || 300;
     var height = self.option.height || 150;
@@ -145,8 +145,8 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
       stepV = Math.abs(max + min) / (yNum - 1);
     }
 
-    !function(){var _2= self.renderBg(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV);left=_2[0];bottom=_2[1];stepX=_2[2];stepY=_2[3]}();
-    self.renderFg(context, height, lineHeight, lineWidth, left, bottom, stepX, stepY, stepV, min);
+    !function(){var _2= self.renderBg(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV);left=_2[0];bottom=_2[1];stepX=_2[2];stepY=_2[3];increase=_2[4]}();
+    self.renderFg(context, height, lineHeight, lineWidth, left, bottom, stepX, stepY, stepV, min, increase);
   }
   Line.prototype.renderBg = function(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV) {
     var color = this.option.color || '#000';
@@ -172,10 +172,11 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     left += offsetX1;
     var stepX = width - padding[1] - padding[3] - offsetX2 - left;
     stepX /= (xNum - 1);
+    var increase = (this.data.label.length - 1) / (xNum - 1);
 
-    this.renderX(context, padding, height, lineHeight, left, xNum, stepX);
+    this.renderX(context, padding, height, lineHeight, left, xNum, stepX, increase);
 
-    return [left, bottom, stepX, stepY];
+    return [left, bottom, stepX, stepY, increase];
   }
   Line.prototype.renderY = function(context, padding, width, height, yNum, min, step, fontSize, stepV, bottom) {
     var left = 0;
@@ -209,17 +210,23 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     var y = height - step * i - padding[2] - lineHeight;
     context.fillText(item[1], x, y);
   }
-  Line.prototype.renderX = function(context, padding, height, lineHeight, left, xNum, step) {
-    var inscrease = Math.floor(this.data.label.length / xNum);
-    for(var i = 0; i < xNum; i += inscrease) {
-      var item = this.data.label[i];
-      var x = left + i * step;
+  Line.prototype.renderX = function(context, padding, height, lineHeight, left, xNum, step, increase) {
+    for(var i = 0; i < xNum - 1; i++) {
+      var item = this.data.label[i * Math.floor(increase)];
+      var x = left + i * step / increase;
       this.renderXItem(item, context, padding, height, lineHeight, x);
       context.beginPath();
       context.moveTo(x, padding[0]);
       context.lineTo(x, height - padding[2] - lineHeight - 10);
       context.stroke();
     }
+    var item = this.data.label[this.data.label.length - 1];
+    var x = left + i * step;
+    this.renderXItem(item, context, padding, height, lineHeight, x);
+    context.beginPath();
+    context.moveTo(x, padding[0]);
+    context.lineTo(x, height - padding[2] - lineHeight - 10);
+    context.stroke();
   }
   Line.prototype.renderXItem = function(item, context, padding, height, lineHeight, x) {
     var txt = item;
@@ -227,7 +234,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     context.fillText(txt, x - (w >> 1), height - lineHeight - padding[2]);
     return w;
   }
-  Line.prototype.renderFg = function(context, height, lineHeight, lineWidth, left, bottom, stepX, stepY, stepV, min) {
+  Line.prototype.renderFg = function(context, height, lineHeight, lineWidth, left, bottom, stepX, stepY, stepV, min, increase) {
     var self = this;
     var coords = [];
     self.data.value.forEach(function(item) {
@@ -238,7 +245,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
           arr.push(null);
           return;
         }
-        var x = left + i * stepX;
+        var x = left + i * stepX / increase;
         var y = height - bottom - (v - min) * stepY / stepV;
         arr.push([x, y]);
       });

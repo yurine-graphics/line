@@ -145,8 +145,8 @@ class Line {
       stepV = Math.abs(max + min) / (yNum - 1);
     }
 
-    var [left, bottom, stepX, stepY] = self.renderBg(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV);
-    self.renderFg(context, height, lineHeight, lineWidth, left, bottom, stepX, stepY, stepV, min);
+    var [left, bottom, stepX, stepY, increase] = self.renderBg(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV);
+    self.renderFg(context, height, lineHeight, lineWidth, left, bottom, stepX, stepY, stepV, min, increase);
   }
   renderBg(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV) {
     var color = this.option.color || '#000';
@@ -172,10 +172,11 @@ class Line {
     left += offsetX1;
     var stepX = width - padding[1] - padding[3] - offsetX2 - left;
     stepX /= (xNum - 1);
+    var increase = (this.data.label.length - 1) / (xNum - 1);
 
-    this.renderX(context, padding, height, lineHeight, left, xNum, stepX);
+    this.renderX(context, padding, height, lineHeight, left, xNum, stepX, increase);
 
-    return [left, bottom, stepX, stepY];
+    return [left, bottom, stepX, stepY, increase];
   }
   renderY(context, padding, width, height, yNum, min, step, fontSize, stepV, bottom) {
     var left = 0;
@@ -209,17 +210,23 @@ class Line {
     var y = height - step * i - padding[2] - lineHeight;
     context.fillText(item[1], x, y);
   }
-  renderX(context, padding, height, lineHeight, left, xNum, step) {
-    var inscrease = Math.floor(this.data.label.length / xNum);
-    for(var i = 0; i < xNum; i += inscrease) {
-      var item = this.data.label[i];
-      var x = left + i * step;
+  renderX(context, padding, height, lineHeight, left, xNum, step, increase) {
+    for(var i = 0; i < xNum - 1; i++) {
+      var item = this.data.label[i * Math.floor(increase)];
+      var x = left + i * step / increase;
       this.renderXItem(item, context, padding, height, lineHeight, x);
       context.beginPath();
       context.moveTo(x, padding[0]);
       context.lineTo(x, height - padding[2] - lineHeight - 10);
       context.stroke();
     }
+    var item = this.data.label[this.data.label.length - 1];
+    var x = left + i * step;
+    this.renderXItem(item, context, padding, height, lineHeight, x);
+    context.beginPath();
+    context.moveTo(x, padding[0]);
+    context.lineTo(x, height - padding[2] - lineHeight - 10);
+    context.stroke();
   }
   renderXItem(item, context, padding, height, lineHeight, x) {
     var txt = item;
@@ -227,7 +234,7 @@ class Line {
     context.fillText(txt, x - (w >> 1), height - lineHeight - padding[2]);
     return w;
   }
-  renderFg(context, height, lineHeight, lineWidth, left, bottom, stepX, stepY, stepV, min) {
+  renderFg(context, height, lineHeight, lineWidth, left, bottom, stepX, stepY, stepV, min, increase) {
     var self = this;
     var coords = [];
     self.data.value.forEach(function(item) {
@@ -238,7 +245,7 @@ class Line {
           arr.push(null);
           return;
         }
-        var x = left + i * stepX;
+        var x = left + i * stepX / increase;
         var y = height - bottom - (v - min) * stepY / stepV;
         arr.push([x, y]);
       });

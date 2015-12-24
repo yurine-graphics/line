@@ -46,6 +46,8 @@
     };
     search.style = search.style || ['curve', 'straight'];
     search.discRadio = search.discRadio || 0;
+    search.xNum = search.xNum || 4;
+    search.yNum = search.yNum || 4;
 
     var textarea = document.querySelector('textarea');
     textarea.value = JSON.stringify(search, null, '  ');
@@ -65,7 +67,9 @@
       lineWidth: search.lineWidth,
       discRadio: search.discRadio,
       styles: search.style,
-      curvature: search.curvature
+      curvature: search.curvature,
+      xNum: search.xNum,
+      yNum: search.yNum
     });
   });
 </script>
