@@ -1,7 +1,7 @@
 {
-  "name": "yurine-pie",
+  "name": "yurine-line",
   "version": "0.1.0",
-  "description": "饼图",
+  "description": "线图",
   "maintainers": [
     {
       "name": "army8735",
@@ -16,7 +16,7 @@
     "url": "git://github.com/migijs/migi.git"
   },
   "keywords": [
-    "radio"
+    "line"
   ],
   "author": "army8735",
   "license": "MIT",

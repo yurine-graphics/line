@@ -66,23 +66,15 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     var paddingY = padding[0] + padding[2];
     var min = Math.min(width - paddingX, height - paddingY);
 
-    var lineWidth = self.option.lineWidth || 1;
-    if(lineWidth < 1) {
-      lineWidth = 1;
-    }
-    else if(lineWidth > min >> 2) {
-      lineWidth = min >> 2;
-    }
+    var lineWidth = parseInt(self.option.lineWidth) || 1;
+    lineWidth = Math.max(lineWidth, 1);
+    lineWidth = Math.min(lineWidth, min >> 2);
 
-    var gridWidth = self.option.gridWidth || 1;
-    if(gridWidth < 1) {
-      gridWidth = 1;
-    }
-    else if(gridWidth > min >> 2) {
-      gridWidth = min >> 2;
-    }
+    var gridWidth = parseInt(self.option.gridWidth) || 1;
+    gridWidth = Math.max(gridWidth, 1);
+    gridWidth = Math.min(gridWidth, min >> 2);
 
-    var length = self.data.label.length || 0;
+    var length = parseInt(self.data.label.length) || 0;
     for(var i = 0, len = self.data.length; i < len; i++) {
       if(self.data[i].length > length) {
         self.data[i] = self.data[i].slice(0, i);
@@ -91,7 +83,6 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
 
     var max = parseFloat(self.data.value[0][1]) || 0;
     var min = parseFloat(self.data.value[0][1]) || 0;
-    var minAbs = Math.abs(min);
     self.data.value.forEach(function(item) {
       item.forEach(function(item2) {
         var v = parseFloat(item2) || 0;
@@ -243,6 +234,10 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
       var arr = [];
       item.forEach(function(item2, i) {
         var v = item2;
+        if(item2 === null || item2 === undefined) {
+          arr.push(null);
+          return;
+        }
         var x = left + i * stepX;
         var y = height - bottom - (v - min) * stepY / stepV;
         arr.push([x, y]);
@@ -268,10 +263,13 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
         break;
     }
     if(self.option.discRadio) {
-      var discRadio = parseInt(self.option.discRadio) || 10;
+      var discRadio = parseInt(self.option.discRadio) || 1;
       discRadio = Math.max(discRadio, 1);
       discRadio = Math.min(discRadio, lineHeight >> 1);
       coords.forEach(function(item) {
+        if(item === null || item === undefined) {
+          return;
+        }
         context.fillStyle = color;
         context.beginPath();
         context.arc(item[0], item[1], discRadio, 0, (Math.PI/180)*360);
@@ -281,20 +279,20 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     }
   }
   Line.prototype.renderCurve = function(context, coords) {
+    var clone = [];
+    coords.forEach(function(item) {
+      if(item !== null && item !== undefined) {
+        clone.push(item);
+      }
+    });
     var centers = [];
-    var ctrols = []
-    for(var i = 0, len = coords.length; i < len - 1; i++) {
-      var item1 = coords[i];
-      var item2 = coords[i + 1];
-      if(!item1 || !item2 || isNaN(item1[0]) || isNaN(item2[0]) || isNaN(item1[1]) || isNaN(item2[1])) {
-        centers.push(null);
-      }
-      else {
-        centers.push([
-          (item1[0] + item2[0]) >> 1,
-          (item1[1] + item2[1]) >> 1
-        ]);
-      }
+    for(var i = 0, len = clone.length; i < len - 1; i++) {
+      var item1 = clone[i];
+      var item2 = clone[i + 1];
+      centers.push([
+        (item1[0] + item2[0]) >> 1,
+        (item1[1] + item2[1]) >> 1
+      ]);
     }
     var curvature = parseFloat(this.option.curvature);
     if(isNaN(curvature)) {
@@ -302,38 +300,34 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     }
     curvature = Math.max(curvature, 0);
     curvature = Math.min(curvature, 1);
+    var ctrols = [];
     for(var i = 0, len = centers.length; i < len - 1; i++) {
       var item1 = centers[i];
       var item2 = centers[i + 1];
-      if(!item1 || !item2 || isNaN(item1[0]) || isNaN(item2[0]) || isNaN(item1[1]) || isNaN(item2[1])) {
-        ctrols.push(null);
-      }
-      else {
-        var item = coords[i + 1];
-        var center = [
-          (item1[0] + item2[0]) >> 1,
-          (item1[1] + item2[1]) >> 1
-        ];
-        var diffX = (center[0] - item[0]);
-        var diffY = (center[1] - item[1]);
-        ctrols.push([
-          item1[0] - diffX * curvature,
-          item1[1] - diffY * curvature,
-          item2[0] - diffX * curvature,
-          item2[1] - diffY * curvature
-        ]);
-      }
+      var item = clone[i + 1];
+      var center = [
+        (item1[0] + item2[0]) >> 1,
+        (item1[1] + item2[1]) >> 1
+      ];
+      var diffX = (center[0] - item[0]);
+      var diffY = (center[1] - item[1]);
+      ctrols.push([
+        item1[0] - diffX * curvature,
+        item1[1] - diffY * curvature,
+        item2[0] - diffX * curvature,
+        item2[1] - diffY * curvature
+      ]);
     }
     context.beginPath();
     context.moveTo(coords[0][0], coords[0][1]);
-    context.quadraticCurveTo(ctrols[0][0], ctrols[0][1], coords[1][0], coords[1][1]);
-    for(var i = 2, len = coords.length; i < len - 1; i++) {
+    context.quadraticCurveTo(ctrols[0][0], ctrols[0][1], clone[1][0], clone[1][1]);
+    for(var i = 2, len = clone.length; i < len - 1; i++) {
       var left = ctrols[i-2];
       var right = ctrols[i-1];
-      context.bezierCurveTo(left[2], left[3], right[0], right[1], coords[i][0], coords[i][1]);
+      context.bezierCurveTo(left[2], left[3], right[0], right[1], clone[i][0], clone[i][1]);
     }
     var ctrl = ctrols[i-2];
-    context.quadraticCurveTo(ctrl[2], ctrl[3], coords[i][0], coords[i][1]);
+    context.quadraticCurveTo(ctrl[2], ctrl[3], clone[i][0], clone[i][1]);
     context.stroke();
     context.closePath();
   }
@@ -343,14 +337,17 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     for(var i = 0, len = coords.length; i < len; i++) {
       var item = coords[i];
       if(start) {
-        if(item) {
+        if(item !== null && item !== undefined) {
           context.moveTo(item[0], item[1]);
           start = false;
         }
       }
-      else if(item) {
+      else if(item !== null && item !== undefined) {
         context.lineTo(item[0], item[1]);
         start = false;
+      }
+      else {
+        start = true;
       }
     }
     context.stroke();
