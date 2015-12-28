@@ -28,14 +28,14 @@ npm install yurine-line
      - padding:int/Array 边距，上右下左，单位px
      - width:int 宽度，单位px
      - height:int 高度，单位px
-     - lineWidth:int 绘线粗细，单位px，最大不超过可视半径，最小不低于1px
+     - lineWidth:int 绘线粗细，单位px，∈\[1, 可视半径]
      - colors:<String> 自定义颜色数组
-     - discRadio:\<int> 数据圆点半径，最大不超过lineHeight的一半，最小不低于0；不设或false、0、null、undefined为不绘制
-     - xNum:int 横坐标显示个数，最大不超过横坐标labels个数，最小不低于1
-     - yNum:int 纵坐标显示个数，最大不超过纵坐标values一组个数，最小不低于1
-     - gridWidth:int 背景网格线粗细，单位px，最大不超过可视半径，最小不低于1px
+     - discRadio:\<int> 数据圆点半径，单位px，∈\[0, lineHeight/2]；不设或false、0、null、undefined为不绘制
+     - xNum:int 横坐标显示个数，∈\[1, labels.length]
+     - yNum:int 纵坐标显示个数，∈\[1, values\[i].length]
+     - gridWidth:int 背景网格线粗细，单位px，∈\[1, 可视半径]
      - styles:\<String> 绘线类型，取值curve、straight，默认straight
-     - curvature:float 曲线曲率，最大不超过1，最小不低于0
+     - curvature:float 曲线曲率，∈\[0, 1]
  * getCoords():\<Array> 获取绘制点的坐标，是个二维数组，包含所有线条
  * getCoord(index:int):\<Array> 获取第index线条的所有坐标，-1从末尾起
  * getPoint():\<x:Number, y:Number> 获取第index线条的第x点的纵坐标，-1从末尾起
