@@ -50,6 +50,8 @@
     search.yNum = search.yNum || 4;
     search.lineWidth = search.lineWidth || 1;
     search.gridWidth = search.gridWidth || 1;
+    search.yLineDash = search.yLineDash || [1];
+    search.xLineDash = search.xLineDash || [4, 4];
 
     var textarea = document.querySelector('textarea');
     textarea.value = JSON.stringify(search, null, '  ');
@@ -73,7 +75,8 @@
       xNum: search.xNum,
       yNum: search.yNum,
       gridWidth: search.gridWidth,
-      lineWidth: search.lineWidth
+      yLineDash: search.yLineDash,
+      xLineDash: search.xLineDash
     });
   });
 </script>

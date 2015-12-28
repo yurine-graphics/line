@@ -92,7 +92,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     });
 
     var font = self.option.font || 'normal normal normal 12px/1.5 Arial';
-    !function(){var _1= util.calFont(font);fontStyle=_1["fontStyle"];fontVariant=_1["fontVariant"];fontFamily=_1["fontFamily"];fontWeight=_1["fontWeight"];fontSize=_1["fontSize"];lineHeight=_1["lineHeight"]}();
+    (function(){var _1= util.calFont(font);fontStyle=_1["fontStyle"];fontVariant=_1["fontVariant"];fontFamily=_1["fontFamily"];fontWeight=_1["fontWeight"];fontSize=_1["fontSize"];lineHeight=_1["lineHeight"]}).call(this);
     context.textBaseline = 'top';
 
     if(self.option.fontSize) {
@@ -137,9 +137,9 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
       yNum = self.data.value[0].length;
     }
 
-    var stepV = stepV = Math.abs(max - min) / (yNum - 1);
+    var stepV = Math.abs(max - min) / (yNum - 1);
 
-    !function(){var _2= self.renderBg(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV);left=_2[0];bottom=_2[1];stepX=_2[2];stepY=_2[3];increase=_2[4]}();
+    (function(){var _2= self.renderBg(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV);left=_2[0];bottom=_2[1];stepX=_2[2];stepY=_2[3];increase=_2[4]}).call(this);
     self.renderFg(context, height, lineHeight, lineWidth, left, bottom, stepX, stepY, stepV, min, increase);
   }
   Line.prototype.renderBg = function(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV) {
@@ -189,6 +189,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
       context.fillText(v, x, y);
     }
     left += 10 + x;
+    context.setLineDash(this.option.yLineDash || [1]);
     for(var i = 0; i < yNum; i++) {
       var y = height - step * i - bottom;
       context.beginPath();
@@ -205,6 +206,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     context.fillText(item[1], x, y);
   }
   Line.prototype.renderX = function(context, padding, height, lineHeight, left, xNum, step, increase) {
+    context.setLineDash(this.option.xLineDash || [1]);
     for(var i = 0; i < xNum - 1; i++) {
       var item = this.data.label[i * Math.floor(increase)];
       var x = left + i * step / increase;
@@ -230,6 +232,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
   }
   Line.prototype.renderFg = function(context, height, lineHeight, lineWidth, left, bottom, stepX, stepY, stepV, min, increase) {
     var self = this;
+    context.setLineDash([1]);
     var coords = [];
     self.data.value.forEach(function(item) {
       var arr = [];

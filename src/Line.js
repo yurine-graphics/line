@@ -137,7 +137,7 @@ class Line {
       yNum = self.data.value[0].length;
     }
 
-    var stepV = stepV = Math.abs(max - min) / (yNum - 1);
+    var stepV = Math.abs(max - min) / (yNum - 1);
 
     var [left, bottom, stepX, stepY, increase] = self.renderBg(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV);
     self.renderFg(context, height, lineHeight, lineWidth, left, bottom, stepX, stepY, stepV, min, increase);
@@ -189,6 +189,7 @@ class Line {
       context.fillText(v, x, y);
     }
     left += 10 + x;
+    context.setLineDash(this.option.yLineDash || [1]);
     for(var i = 0; i < yNum; i++) {
       var y = height - step * i - bottom;
       context.beginPath();
@@ -205,6 +206,7 @@ class Line {
     context.fillText(item[1], x, y);
   }
   renderX(context, padding, height, lineHeight, left, xNum, step, increase) {
+    context.setLineDash(this.option.xLineDash || [1]);
     for(var i = 0; i < xNum - 1; i++) {
       var item = this.data.label[i * Math.floor(increase)];
       var x = left + i * step / increase;
@@ -230,6 +232,7 @@ class Line {
   }
   renderFg(context, height, lineHeight, lineWidth, left, bottom, stepX, stepY, stepV, min, increase) {
     var self = this;
+    context.setLineDash([1]);
     var coords = [];
     self.data.value.forEach(function(item) {
       var arr = [];
