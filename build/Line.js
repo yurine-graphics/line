@@ -233,7 +233,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
   Line.prototype.renderFg = function(context, height, lineHeight, lineWidth, left, bottom, stepX, stepY, stepV, min, increase) {
     var self = this;
     context.setLineDash([1]);
-    var coords = [];
+    var coords = this.coords = [];
     self.data.value.forEach(function(item) {
       var arr = [];
       item.forEach(function(item2, i) {
@@ -356,6 +356,18 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     }
     context.stroke();
     context.closePath();
+  }
+  Line.prototype.getCoords = function() {
+    return this.coords;
+  }
+  Line.prototype.getCoord = function(index) {
+    var length = this.coords.length;
+    return this.coords[index < 0 ? length + index : index];
+  }
+  Line.prototype.getPoint = function(index, x) {
+    var arr = this.getCoord(index);
+    var length = arr.length;
+    return arr[x < 0 ? length + x : x];
   }
 
 

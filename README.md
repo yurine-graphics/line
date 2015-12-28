@@ -36,6 +36,9 @@ npm install yurine-line
      - gridWidth:int 背景网格线粗细，单位px，最大不超过可视半径，最小不低于1px
      - styles:\<String> 绘线类型，取值curve、straight，默认straight
      - curvature:float 曲线曲率，最大不超过1，最小不低于0
+ * getCoords():\<Array> 获取绘制点的坐标，是个二维数组，包含所有线条
+ * getCoord(index:int):\<Array> 获取第index线条的所有坐标，-1从末尾起
+ * getPoint():\<x:Number, y:Number> 获取第index线条的第x点的纵坐标，-1从末尾起
 
 # License
 [MIT License]

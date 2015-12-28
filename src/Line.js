@@ -233,7 +233,7 @@ class Line {
   renderFg(context, height, lineHeight, lineWidth, left, bottom, stepX, stepY, stepV, min, increase) {
     var self = this;
     context.setLineDash([1]);
-    var coords = [];
+    var coords = this.coords = [];
     self.data.value.forEach(function(item) {
       var arr = [];
       item.forEach(function(item2, i) {
@@ -356,6 +356,18 @@ class Line {
     }
     context.stroke();
     context.closePath();
+  }
+  getCoords() {
+    return this.coords;
+  }
+  getCoord(index) {
+    var length = this.coords.length;
+    return this.coords[index < 0 ? length + index : index];
+  }
+  getPoint(index, x) {
+    var arr = this.getCoord(index);
+    var length = arr.length;
+    return arr[x < 0 ? length + x : x];
   }
 }
 
