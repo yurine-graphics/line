@@ -176,8 +176,9 @@ class Line {
     var left = 0;
     var x = padding[3];
 
+    var vs = [];
+    var ws = [];
     for(var i = 0; i < yNum; i++) {
-      var y = height - step * i - bottom - (fontSize >> 1);
       var v = String((min + i * stepV).toFixed(2));
       if(/\.0*$/.test(v)) {
         v = v.replace(/\.0*/, '');
@@ -185,9 +186,18 @@ class Line {
       else if(/\./.test(v)) {
         v = v.replace(/\.([\d]*?)0$/, '.$1');
       }
-      left = Math.max(left, context.measureText(v).width);
-      context.fillText(v, x, y);
+      vs.push(v);
+      var w = context.measureText(v).width;
+      ws.push(w);
+      left = Math.max(left, w);
     }
+    for(var i = 0; i < yNum; i++) {
+      var y = height - step * i - bottom - (fontSize >> 1);
+      var v = vs[i];
+      var w = ws[i];
+      context.fillText(v, x + left - w, y);
+    }
+
     left += 10 + x;
     context.setLineDash(this.option.yLineDash || [1]);
     for(var i = 0; i < yNum; i++) {
