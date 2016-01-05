@@ -29,6 +29,7 @@ npm install yurine-line
      - width:int 宽度，单位px
      - height:int 高度，单位px
      - lineWidth:int 绘线粗细，单位px，∈\[1, 可视半径]
+     - yLineDash:Array\<int> y线虚线类型
      - colors:<String> 自定义颜色数组
      - discRadio:\<int> 数据圆点半径，单位px，∈\[0, lineHeight/2]；不设或false、0、null、undefined为不绘制
      - xNum:int 横坐标显示个数，∈\[1, labels.length]
