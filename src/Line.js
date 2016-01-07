@@ -64,15 +64,15 @@ class Line {
     }
     var paddingX = padding[1] + padding[3];
     var paddingY = padding[0] + padding[2];
-    var min = Math.min(width - paddingX, height - paddingY);
+    var minSize = Math.min(width - paddingX, height - paddingY);
 
     var lineWidth = parseInt(self.option.lineWidth) || 1;
     lineWidth = Math.max(lineWidth, 1);
-    lineWidth = Math.min(lineWidth, min >> 2);
+    lineWidth = Math.min(lineWidth, minSize >> 2);
 
     var gridWidth = parseInt(self.option.gridWidth) || 1;
     gridWidth = Math.max(gridWidth, 1);
-    gridWidth = Math.min(gridWidth, min >> 2);
+    gridWidth = Math.min(gridWidth, minSize >> 2);
 
     var length = parseInt(self.data.label.length) || 0;
     for(var i = 0, len = self.data.length; i < len; i++) {
@@ -242,7 +242,7 @@ class Line {
   }
   renderFg(context, height, lineHeight, lineWidth, left, bottom, stepX, stepY, stepV, min, increase) {
     var self = this;
-    context.setLineDash([1]);
+    context.setLineDash([1, 0]);
     var coords = this.coords = [];
     self.data.value.forEach(function(item) {
       var arr = [];
