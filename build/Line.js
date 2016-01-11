@@ -32,6 +32,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
       };
     this.option = option || {};
     this.option.colors = this.option.colors || [];
+    this.option.areaColors = this.option.areaColors || [];
     this.option.styles = this.option.styles || [];
     this.render();
   }
@@ -64,15 +65,15 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     }
     var paddingX = padding[1] + padding[3];
     var paddingY = padding[0] + padding[2];
-    var min = Math.min(width - paddingX, height - paddingY);
+    var minSize = Math.min(width - paddingX, height - paddingY);
 
     var lineWidth = parseInt(self.option.lineWidth) || 1;
     lineWidth = Math.max(lineWidth, 1);
-    lineWidth = Math.min(lineWidth, min >> 2);
+    lineWidth = Math.min(lineWidth, minSize >> 2);
 
     var gridWidth = parseInt(self.option.gridWidth) || 1;
     gridWidth = Math.max(gridWidth, 1);
-    gridWidth = Math.min(gridWidth, min >> 2);
+    gridWidth = Math.min(gridWidth, minSize >> 2);
 
     var length = parseInt(self.data.label.length) || 0;
     for(var i = 0, len = self.data.length; i < len; i++) {
@@ -98,7 +99,6 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     if(self.option.fontSize) {
       fontSize = parseInt(self.option.fontSize) || 12;
     }
-    fontSize = Math.max(fontSize, 12);
 
     if(self.option.lineHeight) {
       lineHeight = self.option.lineHeight;
@@ -199,7 +199,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     }
 
     left += 10 + x;
-    context.setLineDash(this.option.yLineDash || [1]);
+    context.setLineDash(this.option.yLineDash || [1, 0]);
     for(var i = 0; i < yNum; i++) {
       var y = height - step * i - bottom;
       context.beginPath();
@@ -216,7 +216,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     context.fillText(item[1], x, y);
   }
   Line.prototype.renderX = function(context, padding, height, lineHeight, left, xNum, step, increase) {
-    context.setLineDash(this.option.xLineDash || [1]);
+    context.setLineDash(this.option.xLineDash || [1, 0]);
     for(var i = 0; i < xNum - 1; i++) {
       var item = this.data.label[i * Math.floor(increase)];
       var x = left + i * step / increase;
@@ -242,7 +242,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
   }
   Line.prototype.renderFg = function(context, height, lineHeight, lineWidth, left, bottom, stepX, stepY, stepV, min, increase) {
     var self = this;
-    context.setLineDash([1]);
+    context.setLineDash([1, 0]);
     var coords = this.coords = [];
     self.data.value.forEach(function(item) {
       var arr = [];
@@ -261,19 +261,19 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     coords.forEach(function(item, i) {
       var color = getColor(self.option, i);
       var style = self.option.styles[i];
-      self.renderLine(context, item, lineWidth, lineHeight, color, style);
+      self.renderLine(context, item, i, lineWidth, lineHeight, color, style, height - bottom);
     });
   }
-  Line.prototype.renderLine = function(context, coords, lineWidth, lineHeight, color, style) {
+  Line.prototype.renderLine = function(context, coords, index, lineWidth, lineHeight, color, style, y) {
     var self = this;
     context.strokeStyle = color;
     context.lineWidth = lineWidth;
     switch(style) {
       case 'curve':
-        this.renderCurve(context, coords);
+        this.renderCurve(context, coords, index, y);
         break;
       default:
-        this.renderStraight(context, coords);
+        this.renderStraight(context, coords, index, y);
         break;
     }
     if(self.option.discRadio) {
@@ -292,76 +292,104 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
       });
     }
   }
-  Line.prototype.renderCurve = function(context, coords) {
-    var clone = [];
-    coords.forEach(function(item) {
-      if(item !== null && item !== undefined) {
-        clone.push(item);
+  Line.prototype.renderCurve = function(context, coords, index, y) {
+    if(coords.length) {
+      var clone = [];
+      coords.forEach(function(item) {
+        if(item === null || item === undefined) {
+          return;
+        }
+        if(item !== null && item !== undefined) {
+          clone.push(item);
+        }
+      });
+      var centers = [];
+      for(var i = 0, len = clone.length; i < len - 1; i++) {
+        var item1 = clone[i];
+        var item2 = clone[i + 1];
+        centers.push([
+          (item1[0] + item2[0]) >> 1,
+          (item1[1] + item2[1]) >> 1
+        ]);
       }
-    });
-    var centers = [];
-    for(var i = 0, len = clone.length; i < len - 1; i++) {
-      var item1 = clone[i];
-      var item2 = clone[i + 1];
-      centers.push([
-        (item1[0] + item2[0]) >> 1,
-        (item1[1] + item2[1]) >> 1
-      ]);
+      var curvature = parseFloat(this.option.curvature);
+      if(isNaN(curvature)) {
+        curvature = 1;
+      }
+      curvature = Math.max(curvature, 0);
+      curvature = Math.min(curvature, 1);
+      var ctrols = [];
+      for(var i = 0, len = centers.length; i < len - 1; i++) {
+        var item1 = centers[i];
+        var item2 = centers[i + 1];
+        var item = clone[i + 1];
+        var center = [
+          (item1[0] + item2[0]) >> 1,
+          (item1[1] + item2[1]) >> 1
+        ];
+        var diffX = (center[0] - item[0]);
+        var diffY = (center[1] - item[1]);
+        ctrols.push([
+          item1[0] - diffX * curvature,
+          item1[1] - diffY * curvature,
+          item2[0] - diffX * curvature,
+          item2[1] - diffY * curvature
+        ]);
+      }
+
+      context.beginPath();
+      var start = clone[0];
+      var end = clone[clone.length - 1];
+      context.moveTo(start[0], start[1]);
+      context.quadraticCurveTo(ctrols[0][0], ctrols[0][1], clone[1][0], clone[1][1]);
+      for(var i = 2, len = clone.length; i < len - 1; i++) {
+        var left = ctrols[i - 2];
+        var right = ctrols[i - 1];
+        context.bezierCurveTo(left[2], left[3], right[0], right[1], clone[i][0], clone[i][1]);
+      }
+      var ctrl = ctrols[i - 2];
+      context.quadraticCurveTo(ctrl[2], ctrl[3], clone[i][0], clone[i][1]);
+      context.stroke();console.log(start, end, y)
+      var fill = this.option.areaColors[index];
+      if(fill && fill != 'transparent') {
+        context.fillStyle = fill;
+        context.lineTo(end[0], y);
+        context.lineTo(start[0], y);
+        context.lineTo(start[0], start[1]);
+        context.fill();
+      }
+      context.closePath();
     }
-    var curvature = parseFloat(this.option.curvature);
-    if(isNaN(curvature)) {
-      curvature = 1;
-    }
-    curvature = Math.max(curvature, 0);
-    curvature = Math.min(curvature, 1);
-    var ctrols = [];
-    for(var i = 0, len = centers.length; i < len - 1; i++) {
-      var item1 = centers[i];
-      var item2 = centers[i + 1];
-      var item = clone[i + 1];
-      var center = [
-        (item1[0] + item2[0]) >> 1,
-        (item1[1] + item2[1]) >> 1
-      ];
-      var diffX = (center[0] - item[0]);
-      var diffY = (center[1] - item[1]);
-      ctrols.push([
-        item1[0] - diffX * curvature,
-        item1[1] - diffY * curvature,
-        item2[0] - diffX * curvature,
-        item2[1] - diffY * curvature
-      ]);
-    }
-    context.beginPath();
-    context.moveTo(coords[0][0], coords[0][1]);
-    context.quadraticCurveTo(ctrols[0][0], ctrols[0][1], clone[1][0], clone[1][1]);
-    for(var i = 2, len = clone.length; i < len - 1; i++) {
-      var left = ctrols[i-2];
-      var right = ctrols[i-1];
-      context.bezierCurveTo(left[2], left[3], right[0], right[1], clone[i][0], clone[i][1]);
-    }
-    var ctrl = ctrols[i-2];
-    context.quadraticCurveTo(ctrl[2], ctrl[3], clone[i][0], clone[i][1]);
-    context.stroke();
-    context.closePath();
   }
-  Line.prototype.renderStraight = function(context, coords) {
+  Line.prototype.renderStraight = function(context, coords, index, y) {
     context.beginPath();
-    var start = true;
+    var fill = this.option.areaColors[index];
+    if(fill == 'transparent') {
+      fill = null;
+    }
+    var start;
+    var end;
     for(var i = 0, len = coords.length; i < len; i++) {
       var item = coords[i];
       if(start) {
         if(item !== null && item !== undefined) {
-          context.moveTo(item[0], item[1]);
-          start = false;
+          context.lineTo(item[0], item[1]);
+          end = item;
+        }
+        else {
+          if(fill) {
+            context.lineTo(end[0], y);
+            context.lineTo(start[0], y);
+            context.lineTo(start[0], start[1]);
+            context.fill();
+          }
+          context.stroke();
+          start = end = null;
         }
       }
       else if(item !== null && item !== undefined) {
-        context.lineTo(item[0], item[1]);
-        start = false;
-      }
-      else {
-        start = true;
+        start = item;
+        context.lineTo(start[0], start[1]);
       }
     }
     context.stroke();

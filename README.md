@@ -29,8 +29,10 @@ npm install yurine-line
      - width:int 宽度，单位px
      - height:int 高度，单位px
      - lineWidth:int 绘线粗细，单位px，∈\[1, 可视半径]
+     - xLineDash:Array\<int> x线虚线类型
      - yLineDash:Array\<int> y线虚线类型
-     - colors:<String> 自定义颜色数组
+     - colors:\<String> 自定义颜色数组
+     - areaColor:\<String> 自定义区域颜色数组，无区域填空或transparent
      - discRadio:\<int> 数据圆点半径，单位px，∈\[0, lineHeight/2]；不设或false、0、null、undefined为不绘制
      - xNum:int 横坐标显示个数，∈\[1, labels.length]
      - yNum:int 纵坐标显示个数，∈\[1, values\[i].length]
@@ -38,8 +40,8 @@ npm install yurine-line
      - styles:\<String> 绘线类型，取值curve、straight，默认straight
      - curvature:float 曲线曲率，∈\[0, 1]
  * getCoords():\<Array> 获取绘制点的坐标，是个二维数组，包含所有线条
- * getCoord(index:int):\<Array> 获取第index线条的所有坐标，-1从末尾起
- * getPoint():\<x:Number, y:Number> 获取第index线条的第x点的纵坐标，-1从末尾起
+ * getCoord(index:int):\<Array\<x:Number, y:Number>> 获取第index线条的所有坐标，-1从末尾起
+ * getPoint(index:int, x:int):\<x:Number, y:Number> 获取第index线条的第j点的纵坐标，-1从末尾起
 
 # License
 [MIT License]
