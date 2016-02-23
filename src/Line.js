@@ -139,8 +139,8 @@ class Line {
 
     var stepV = Math.abs(max - min) / (yNum - 1);
 
-    var [left, bottom, stepX, stepY, increase] = self.renderBg(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV);
-    self.renderFg(context, height, lineHeight, lineWidth, left, bottom, stepX, stepY, stepV, min, increase);
+    var [left, bottom, stepX, stepY] = self.renderBg(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV);
+    self.renderFg(context, height, lineHeight, lineWidth, left, bottom, stepX, stepY, stepV, min);
   }
   renderBg(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV) {
     var color = this.option.color || '#000';
@@ -170,7 +170,7 @@ class Line {
 
     this.renderX(context, padding, height, lineHeight, left, xNum, stepX, increase);
 
-    return [left, bottom, stepX, stepY, increase];
+    return [left, bottom, stepX, stepY];
   }
   renderY(context, padding, width, height, yNum, min, stepY, fontSize, stepV, bottom) {
     var left = 0;
@@ -239,7 +239,7 @@ class Line {
     context.fillText(item, x - (w >> 1), height - lineHeight - padding[2]);
     return w;
   }
-  renderFg(context, height, lineHeight, lineWidth, left, bottom, stepX, stepY, stepV, min, increase) {
+  renderFg(context, height, lineHeight, lineWidth, left, bottom, stepX, stepY, stepV, min) {
     var self = this;
     context.setLineDash([1, 0]);
     var coords = this.coords = [];
