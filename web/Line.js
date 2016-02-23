@@ -38,7 +38,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
   }
 
   Line.prototype.render = function() {
-    var increase;var stepY;var stepX;var bottom;var left;var lineHeight;var fontSize;var fontWeight;var fontFamily;var fontVariant;var fontStyle;var self = this;
+    var stepY;var stepX;var bottom;var left;var lineHeight;var fontSize;var fontWeight;var fontFamily;var fontVariant;var fontStyle;var self = this;
     var context = self.dom.getContext('2d');
     var width = self.option.width || 300;
     var height = self.option.height || 150;
@@ -139,8 +139,8 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
 
     var stepV = Math.abs(max - min) / (yNum - 1);
 
-    (function(){var _2= self.renderBg(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV);left=_2[0];bottom=_2[1];stepX=_2[2];stepY=_2[3];increase=_2[4]}).call(this);
-    self.renderFg(context, height, lineHeight, lineWidth, left, bottom, stepX, stepY, stepV, min, increase);
+    (function(){var _2= self.renderBg(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV);left=_2[0];bottom=_2[1];stepX=_2[2];stepY=_2[3]}).call(this);
+    self.renderFg(context, height, lineHeight, lineWidth, left, bottom, stepX, stepY, stepV, min);
   }
   Line.prototype.renderBg = function(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV) {
     var color = this.option.color || '#000';
@@ -170,7 +170,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
 
     this.renderX(context, padding, height, lineHeight, left, xNum, stepX, increase);
 
-    return [left, bottom, stepX, stepY, increase];
+    return [left, bottom, stepX, stepY];
   }
   Line.prototype.renderY = function(context, padding, width, height, yNum, min, stepY, fontSize, stepV, bottom) {
     var left = 0;
@@ -239,7 +239,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     context.fillText(item, x - (w >> 1), height - lineHeight - padding[2]);
     return w;
   }
-  Line.prototype.renderFg = function(context, height, lineHeight, lineWidth, left, bottom, stepX, stepY, stepV, min, increase) {
+  Line.prototype.renderFg = function(context, height, lineHeight, lineWidth, left, bottom, stepX, stepY, stepV, min) {
     var self = this;
     context.setLineDash([1, 0]);
     var coords = this.coords = [];
