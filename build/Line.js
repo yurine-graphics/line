@@ -165,14 +165,14 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     var offsetX2 = context.measureText(this.data.label[this.data.label.length - 1]).width >> 1;
     left += offsetX1;
     var stepX = width - padding[1] - padding[3] - offsetX2 - left;
-    stepX /= (xNum - 1);
+    stepX /= this.data.label.length - 1;
     var increase = (this.data.label.length - 1) / (xNum - 1);
 
     this.renderX(context, padding, height, lineHeight, left, xNum, stepX, increase);
 
     return [left, bottom, stepX, stepY, increase];
   }
-  Line.prototype.renderY = function(context, padding, width, height, yNum, min, step, fontSize, stepV, bottom) {
+  Line.prototype.renderY = function(context, padding, width, height, yNum, min, stepY, fontSize, stepV, bottom) {
     var left = 0;
     var x = padding[3];
 
@@ -192,7 +192,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
       left = Math.max(left, w);
     }
     for(var i = 0; i < yNum; i++) {
-      var y = height - step * i - bottom - (fontSize >> 1);
+      var y = height - stepY * i - bottom - (fontSize >> 1);
       var v = vs[i];
       var w = ws[i];
       context.fillText(v, x + left - w, y);
@@ -201,7 +201,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     left += 10 + x;
     context.setLineDash(this.option.yLineDash || [1, 0]);
     for(var i = 0; i < yNum; i++) {
-      var y = height - step * i - bottom;
+      var y = height - stepY * i - bottom;
       context.beginPath();
       context.moveTo(left, y);
       context.lineTo(width - padding[1], y);
@@ -210,16 +210,16 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
 
     return left;
   }
-  Line.prototype.renderYItem = function(item, i, context, padding, height, lineHeight, step) {
+  Line.prototype.renderYItem = function(item, i, context, padding, height, lineHeight, stepY) {
     var x = padding[3];
-    var y = height - step * i - padding[2] - lineHeight;
+    var y = height - stepY * i - padding[2] - lineHeight;
     context.fillText(item[1], x, y);
   }
-  Line.prototype.renderX = function(context, padding, height, lineHeight, left, xNum, step, increase) {
+  Line.prototype.renderX = function(context, padding, height, lineHeight, left, xNum, stepX, increase) {
     context.setLineDash(this.option.xLineDash || [1, 0]);
     for(var i = 0; i < xNum - 1; i++) {
       var item = this.data.label[i * Math.floor(increase)];
-      var x = left + i * step / increase;
+      var x = left + i * stepX * Math.floor(increase);
       this.renderXItem(item, context, padding, height, lineHeight, x);
       context.beginPath();
       context.moveTo(x, padding[0]);
@@ -227,7 +227,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
       context.stroke();
     }
     var item = this.data.label[this.data.label.length - 1];
-    var x = left + i * step;
+    var x = left + stepX * (this.data.label.length - 1);
     this.renderXItem(item, context, padding, height, lineHeight, x);
     context.beginPath();
     context.moveTo(x, padding[0]);
@@ -235,9 +235,8 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     context.stroke();
   }
   Line.prototype.renderXItem = function(item, context, padding, height, lineHeight, x) {
-    var txt = item;
-    var w = context.measureText(txt).width;
-    context.fillText(txt, x - (w >> 1), height - lineHeight - padding[2]);
+    var w = context.measureText(item).width;
+    context.fillText(item, x - (w >> 1), height - lineHeight - padding[2]);
     return w;
   }
   Line.prototype.renderFg = function(context, height, lineHeight, lineWidth, left, bottom, stepX, stepY, stepV, min, increase) {
@@ -252,7 +251,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
           arr.push(null);
           return;
         }
-        var x = left + i * stepX / increase;
+        var x = left + i * stepX;
         var y = height - bottom - (v - min) * stepY / stepV;
         arr.push([x, y]);
       });
@@ -349,7 +348,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
       }
       var ctrl = ctrols[i - 2];
       context.quadraticCurveTo(ctrl[2], ctrl[3], clone[i][0], clone[i][1]);
-      context.stroke();console.log(start, end, y)
+      context.stroke();
       var fill = this.option.areaColors[index];
       if(fill && fill != 'transparent') {
         context.fillStyle = fill;
