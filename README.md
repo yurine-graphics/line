@@ -31,6 +31,8 @@ npm install yurine-line
      - lineWidth:int 绘线粗细，单位px，∈\[1, 可视半径]
      - xLineDash:Array\<int> x线虚线类型
      - yLineDash:Array\<int> y线虚线类型
+     - percent:Boolean y轴是否为百分比
+     - format:Function 自定义y轴格式化回调
      - colors:Array\<String> 自定义颜色数组
      - areaColor:Array\<String> 自定义区域颜色数组，无区域填空或transparent
      - discRadio:Array\<int> 数据圆点半径，单位px，∈\[0, lineHeight/2]；不设或false、0、null、undefined为不绘制

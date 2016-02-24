@@ -189,12 +189,12 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     var vs = [];
     var ws = [];
     for(var i = 0; i < yNum; i++) {
-      var v = String((min + i * stepV).toFixed(fixed));
-      if(/\.0*$/.test(v)) {
-        v = v.replace(/\.0*/, '');
+      var v;
+      if(this.option.format) {
+        v = this.option.format((min + i * stepV).toFixed(fixed));
       }
-      else if(/\./.test(v)) {
-        v = v.replace(/\.([\d]*?)0$/, '.$1');
+      else {
+        v = this.option.percent ? (((min + i * stepV) * 100).toFixed(fixed) + '%') : (min + i * stepV).toFixed(fixed);
       }
       vs.push(v);
       var w = context.measureText(v).width;
@@ -219,11 +219,6 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     }
 
     return left;
-  }
-  Line.prototype.renderYItem = function(item, i, context, padding, height, lineHeight, stepY) {
-    var x = padding[3];
-    var y = height - stepY * i - padding[2] - lineHeight;
-    context.fillText(item[1], x, y);
   }
   Line.prototype.renderX = function(context, padding, height, lineHeight, left, xNum, stepX, increase) {
     context.setLineDash(this.option.xLineDash || [1, 0]);
