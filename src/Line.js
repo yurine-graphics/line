@@ -91,6 +91,15 @@ class Line {
         min = Math.min(min, v);
       });
     });
+    if(self.option.max !== undefined && self.option.max !== null) {
+      max = parseFloat(self.option.max);
+    }
+    if(self.option.min !== undefined && self.option.min !== null) {
+      min = parseFloat(self.option.min);
+    }
+    if(max < min) {
+      max = min;
+    }
 
     var font = self.option.font || 'normal normal normal 12px/1.5 Arial';
     var { fontStyle, fontVariant, fontFamily, fontWeight, fontSize, lineHeight } = util.calFont(font);
@@ -175,11 +184,12 @@ class Line {
   renderY(context, padding, width, height, yNum, min, stepY, fontSize, stepV, bottom) {
     var left = 0;
     var x = padding[3];
+    var fixed = parseInt(this.option.fixed) || 0;
 
     var vs = [];
     var ws = [];
     for(var i = 0; i < yNum; i++) {
-      var v = String((min + i * stepV).toFixed(2));
+      var v = String((min + i * stepV).toFixed(fixed));
       if(/\.0*$/.test(v)) {
         v = v.replace(/\.0*/, '');
       }

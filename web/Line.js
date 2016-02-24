@@ -91,6 +91,15 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
         min = Math.min(min, v);
       });
     });
+    if(self.option.max !== undefined && self.option.max !== null) {
+      max = parseFloat(self.option.max);
+    }
+    if(self.option.min !== undefined && self.option.min !== null) {
+      min = parseFloat(self.option.min);
+    }
+    if(max < min) {
+      max = min;
+    }
 
     var font = self.option.font || 'normal normal normal 12px/1.5 Arial';
     (function(){var _1= util.calFont(font);fontStyle=_1["fontStyle"];fontVariant=_1["fontVariant"];fontFamily=_1["fontFamily"];fontWeight=_1["fontWeight"];fontSize=_1["fontSize"];lineHeight=_1["lineHeight"]}).call(this);
@@ -175,11 +184,12 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
   Line.prototype.renderY = function(context, padding, width, height, yNum, min, stepY, fontSize, stepV, bottom) {
     var left = 0;
     var x = padding[3];
+    var fixed = parseInt(this.option.fixed) || 0;
 
     var vs = [];
     var ws = [];
     for(var i = 0; i < yNum; i++) {
-      var v = String((min + i * stepV).toFixed(2));
+      var v = String((min + i * stepV).toFixed(fixed));
       if(/\.0*$/.test(v)) {
         v = v.replace(/\.0*/, '');
       }

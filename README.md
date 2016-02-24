@@ -36,6 +36,9 @@ npm install yurine-line
      - discRadio:Array\<int> 数据圆点半径，单位px，∈\[0, lineHeight/2]；不设或false、0、null、undefined为不绘制
      - xNum:int 横坐标显示个数，∈\[1, labels.length]
      - yNum:int 纵坐标显示个数，∈\[1, values\[i].length]
+     - max:Number y轴自定义最大值，空为数据中最大值
+     - min:Number y轴自定义最小值，空为数据中最小值
+     - fixed:int y轴小数位个数
      - gridWidth:int 背景网格线粗细，单位px，∈\[1, 可视半径]
      - styles:Array\<String> 绘线类型，取值curve、straight，默认straight
      - curvature:float 曲线曲率，∈\[0, 1]
