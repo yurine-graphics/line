@@ -15,8 +15,8 @@ npm install yurine-line
  * Line(selector:DOM/String, data:\<\<String>, \<int>>, option:Object):Class
    * selector:String 渲染的canvas对象或选择器
    * data:Object 渲染数据数组
-     - labels:Array\<String> 标签
-     - values:Array\<Array\<int>> 值组 
+     - label:Array\<String> 标签
+     - value:Array\<Array\<int>> 值组 
    * option:Object 选项
      - font:String 文字字体css缩写
      - fontFamily:String 文字字体，会覆盖font
@@ -45,7 +45,8 @@ npm install yurine-line
      - gridWidth:int 背景网格线粗细，单位px，∈\[1, 可视半径]
      - styles:Array\<String> 绘线类型，取值curve、straight，默认straight
      - curvature:float 曲线曲率，∈\[0, 1]
-     - outline:Boolean 横纵线是否出头
+     - xOutline:Boolean 横线是否出头
+     - yOutline:Boolean 纵线是否出头
  * getCoords():Array\<Array> 获取绘制点的坐标，是个二维数组，包含所有线条
  * getCoord(index:int):Array\<Array\<x:Number, y:Number>> 获取第index线条的所有坐标，-1从末尾起
  * getPoint(index:int, j:int):Array\<x:Number, y:Number> 获取第index线条的第j点的纵坐标，-1从末尾起

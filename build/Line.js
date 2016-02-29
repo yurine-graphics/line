@@ -189,8 +189,8 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     var coords = this.yCoords = [];
     var vs = [];
     var ws = [];
+    var v;
     for(var i = 0; i < yNum; i++) {
-      var v;
       if(this.option.format) {
         v = this.option.format((min + i * stepV).toFixed(fixed));
       }
@@ -212,11 +212,13 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
 
     left += 10 + x;
     context.setLineDash(this.option.yLineDash || [1, 0]);
+    var start = this.option.xOutline ? 0 : context.measureText(this.data.label[0] || '').width >> 1;
+    var end = this.option.xOutline ? 0 : context.measureText(this.data.label[this.data.label.length - 1] || '').width >> 1;
     for(var i = 0; i < yNum; i++) {
       var y = height - stepY * i - bottom;
       context.beginPath();
-      context.moveTo(left, y);
-      context.lineTo(width - padding[1], y);
+      context.moveTo(left + start, y);
+      context.lineTo(width - padding[1] - 10 - end, y);
       context.stroke();
     }
 
@@ -232,8 +234,8 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
       this.renderXItem(item, context, padding, height, lineHeight, x);
       coords.push([x, y]);
       context.beginPath();
-      context.moveTo(x, padding[0]);
-      context.lineTo(x, y - 10);
+      context.moveTo(x, padding[0] + (this.option.yOutline ? 0 : lineHeight >> 1));
+      context.lineTo(x, y - 10 - (this.option.yOutline ? 0 : lineHeight >> 1));
       context.stroke();
     }
     var item = this.data.label[this.data.label.length - 1];
@@ -241,8 +243,8 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     this.renderXItem(item, context, padding, height, lineHeight, x);
     coords.push([x, y]);
     context.beginPath();
-    context.moveTo(x, padding[0]);
-    context.lineTo(x, y - 10);
+    context.moveTo(x, padding[0] + (this.option.yOutline ? 0 : lineHeight >> 1));
+    context.lineTo(x, y - 10 - (this.option.yOutline ? 0 : lineHeight >> 1));
     context.stroke();
   }
   Line.prototype.renderXItem = function(item, context, padding, height, lineHeight, x) {
