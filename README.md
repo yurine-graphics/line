@@ -45,9 +45,12 @@ npm install yurine-line
      - gridWidth:int 背景网格线粗细，单位px，∈\[1, 可视半径]
      - styles:Array\<String> 绘线类型，取值curve、straight，默认straight
      - curvature:float 曲线曲率，∈\[0, 1]
+     - outline:Boolean 横纵线是否出头
  * getCoords():Array\<Array> 获取绘制点的坐标，是个二维数组，包含所有线条
  * getCoord(index:int):Array\<Array\<x:Number, y:Number>> 获取第index线条的所有坐标，-1从末尾起
  * getPoint(index:int, j:int):Array\<x:Number, y:Number> 获取第index线条的第j点的纵坐标，-1从末尾起
+ * getXLabelCoords():Array\<Array\<x:Number, y:Number>> 获取x坐标标签，是个二维数组，包含所有线条
+ * getYLabelCoords():Array\<Array\<x:Number, y:Number>> 获取y坐标标签，是个二维数组，包含所有线条
 
 # License
 [MIT License]

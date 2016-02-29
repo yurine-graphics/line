@@ -186,6 +186,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     var x = padding[3];
     var fixed = parseInt(this.option.fixed) || 0;
 
+    var coords = this.yCoords = [];
     var vs = [];
     var ws = [];
     for(var i = 0; i < yNum; i++) {
@@ -206,6 +207,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
       var v = vs[i];
       var w = ws[i];
       context.fillText(v, x + left - w, y);
+      coords.push([x + left - (w >> 1), y]);
     }
 
     left += 10 + x;
@@ -221,22 +223,26 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     return left;
   }
   Line.prototype.renderX = function(context, padding, height, lineHeight, left, xNum, stepX, increase) {
+    var coords = this.xCoords = [];
     context.setLineDash(this.option.xLineDash || [1, 0]);
+    var y = height - lineHeight - padding[2];
     for(var i = 0; i < xNum - 1; i++) {
       var item = this.data.label[i * Math.floor(increase)];
       var x = left + i * stepX * Math.floor(increase);
       this.renderXItem(item, context, padding, height, lineHeight, x);
+      coords.push([x, y]);
       context.beginPath();
       context.moveTo(x, padding[0]);
-      context.lineTo(x, height - padding[2] - lineHeight - 10);
+      context.lineTo(x, y - 10);
       context.stroke();
     }
     var item = this.data.label[this.data.label.length - 1];
     var x = left + stepX * (this.data.label.length - 1);
     this.renderXItem(item, context, padding, height, lineHeight, x);
+    coords.push([x, y]);
     context.beginPath();
     context.moveTo(x, padding[0]);
-    context.lineTo(x, height - padding[2] - lineHeight - 10);
+    context.lineTo(x, y - 10);
     context.stroke();
   }
   Line.prototype.renderXItem = function(item, context, padding, height, lineHeight, x) {
@@ -410,6 +416,12 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     var arr = this.getCoord(index);
     var length = arr.length;
     return arr[x < 0 ? length + x : x];
+  }
+  Line.prototype.getXLabelCoords = function() {
+    return this.xCoords;
+  }
+  Line.prototype.getYLabelCoords = function() {
+    return this.yCoords;
   }
 
 
