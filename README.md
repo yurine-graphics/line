@@ -25,12 +25,14 @@ npm install yurine-line
      - fontStyle:String 文字样式，会覆盖font
      - fontSize:int 文字大小，单位px，会覆盖font
      - lineHeight:String/int 行高，单位px，会覆盖font
-     - padding:int/Array 边距，上右下左，单位px
+     - padding:int/Array 边距，上右下左，单位px，默认10
      - width:int 宽度，单位px
      - height:int 高度，单位px
      - lineWidth:int 绘线粗细，单位px，∈\[1, 可视半径]
      - xLineDash:Array\<int> x线虚线类型
      - yLineDash:Array\<int> y线虚线类型
+     - xLine:Boolean x轴显示
+     - yLine:Boolean y轴显示
      - percent:Boolean y轴是否为百分比
      - format:Function 自定义y轴格式化回调
      - color:String 坐标轴字体颜色

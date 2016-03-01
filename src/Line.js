@@ -42,7 +42,7 @@ class Line {
     var context = self.dom.getContext('2d');
     var width = self.option.width || 300;
     var height = self.option.height || 150;
-    var padding = self.option.padding || [10, 10, 10, 10];
+    var padding = self.option.hasOwnProperty('padding') ? self.option.padding : [10, 10, 10, 10];
     if(Array.isArray(padding)) {
       switch(padding.length) {
         case 0:
@@ -211,15 +211,17 @@ class Line {
     }
 
     left += 10 + x;
-    context.setLineDash(this.option.yLineDash || [1, 0]);
-    var start = this.option.xOutline ? 0 : context.measureText(this.data.label[0] || '').width >> 1;
-    var end = this.option.xOutline ? 0 : context.measureText(this.data.label[this.data.label.length - 1] || '').width >> 1;
-    for(var i = 0; i < yNum; i++) {
-      var y = height - stepY * i - bottom;
-      context.beginPath();
-      context.moveTo(left + start, y);
-      context.lineTo(width - padding[1] - 10 - end, y);
-      context.stroke();
+    if(this.option.xLine) {
+      context.setLineDash(this.option.yLineDash || [1, 0]);
+      var start = this.option.xOutline ? 0 : context.measureText(this.data.label[0] || '').width >> 1;
+      var end = this.option.xOutline ? 0 : context.measureText(this.data.label[this.data.label.length - 1] || '').width >> 1;
+      for(var i = 0; i < yNum; i++) {
+        var y = height - stepY * i - bottom;
+        context.beginPath();
+        context.moveTo(left + start, y);
+        context.lineTo(width - padding[1] - 10 - end, y);
+        context.stroke();
+      }
     }
 
     return left;
@@ -233,19 +235,23 @@ class Line {
       var x = left + i * stepX * Math.floor(increase);
       this.renderXItem(item, context, padding, height, lineHeight, x);
       coords.push([x, y]);
-      context.beginPath();
-      context.moveTo(x, padding[0] + (this.option.yOutline ? 0 : lineHeight >> 1));
-      context.lineTo(x, y - 10 - (this.option.yOutline ? 0 : lineHeight >> 1));
-      context.stroke();
+      if(this.option.yLine) {
+        context.beginPath();
+        context.moveTo(x, padding[0] + (this.option.yOutline ? 0 : lineHeight >> 1));
+        context.lineTo(x, y - 10 - (this.option.yOutline ? 0 : lineHeight >> 1));
+        context.stroke();
+      }
     }
     var item = this.data.label[this.data.label.length - 1];
     var x = left + stepX * (this.data.label.length - 1);
     this.renderXItem(item, context, padding, height, lineHeight, x);
     coords.push([x, y]);
-    context.beginPath();
-    context.moveTo(x, padding[0] + (this.option.yOutline ? 0 : lineHeight >> 1));
-    context.lineTo(x, y - 10 - (this.option.yOutline ? 0 : lineHeight >> 1));
-    context.stroke();
+    if(this.option.yLine) {
+      context.beginPath();
+      context.moveTo(x, padding[0] + (this.option.yOutline ? 0 : lineHeight >> 1));
+      context.lineTo(x, y - 10 - (this.option.yOutline ? 0 : lineHeight >> 1));
+      context.stroke();
+    }
   }
   renderXItem(item, context, padding, height, lineHeight, x) {
     var w = context.measureText(item).width;
