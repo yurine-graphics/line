@@ -29,6 +29,7 @@ npm install yurine-line
      - width:int 宽度，单位px
      - height:int 高度，单位px
      - lineWidth:int 绘线粗细，单位px，∈\[1, 可视半径]
+     - gridColor:String 背景网格线颜色
      - xLineDash:Array\<int> x线虚线类型
      - yLineDash:Array\<int> y线虚线类型
      - xLine:Boolean x轴显示
