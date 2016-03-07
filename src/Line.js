@@ -172,8 +172,10 @@ class Line {
 
     var offsetX1 = context.measureText(this.data.label[0]).width >> 1;
     var offsetX2 = context.measureText(this.data.label[this.data.label.length - 1]).width >> 1;
-    left += offsetX1;
-    var stepX = width - padding[1] - padding[3] - offsetX2 - left;
+    if(this.option.xOutline) {
+      left += offsetX1;
+    }
+    var stepX = width - padding[1] - padding[3] - left - (this.option.xOutline ? offsetX2 : 0);
     stepX /= this.data.label.length - 1;
     var increase = (this.data.label.length - 1) / (xNum - 1);
 
@@ -213,13 +215,11 @@ class Line {
     left += 10 + x;
     if(this.option.xLine) {
       context.setLineDash(this.option.yLineDash || [1, 0]);
-      var start = this.option.xOutline ? 0 : context.measureText(this.data.label[0] || '').width >> 1;
-      var end = this.option.xOutline ? 0 : context.measureText(this.data.label[this.data.label.length - 1] || '').width >> 1;
       for(var i = 0; i < yNum; i++) {
         var y = height - stepY * i - bottom;
         context.beginPath();
-        context.moveTo(left + start, y);
-        context.lineTo(width - padding[1] - 10 - end, y);
+        context.moveTo(left, y);
+        context.lineTo(width - padding[1], y);
         context.stroke();
       }
     }
@@ -233,7 +233,7 @@ class Line {
     for(var i = 0; i < xNum - 1; i++) {
       var item = this.data.label[i * Math.floor(increase)];
       var x = left + i * stepX * Math.floor(increase);
-      this.renderXItem(item, context, padding, height, lineHeight, x);
+      this.renderXItem(item, context, padding, height, lineHeight, x, i == 0);
       coords.push([x, y]);
       if(this.option.yLine) {
         context.beginPath();
@@ -244,7 +244,7 @@ class Line {
     }
     var item = this.data.label[this.data.label.length - 1];
     var x = left + stepX * (this.data.label.length - 1);
-    this.renderXItem(item, context, padding, height, lineHeight, x);
+    this.renderXItem(item, context, padding, height, lineHeight, x, false, true);
     coords.push([x, y]);
     if(this.option.yLine) {
       context.beginPath();
@@ -253,9 +253,19 @@ class Line {
       context.stroke();
     }
   }
-  renderXItem(item, context, padding, height, lineHeight, x) {
+  renderXItem(item, context, padding, height, lineHeight, x, first, end) {console.log(first, end)
     var w = context.measureText(item).width;
-    context.fillText(item, x - (w >> 1), height - lineHeight - padding[2]);
+    if(!this.option.xOutline && (first || end)) {
+      if(first) {
+        context.fillText(item, x, height - lineHeight - padding[2]);
+      }
+      else {
+        context.fillText(item, x - w, height - lineHeight - padding[2]);
+      }
+    }
+    else {
+      context.fillText(item, x - (w >> 1), height - lineHeight - padding[2]);
+    }
     return w;
   }
   renderFg(context, height, lineHeight, lineWidth, left, bottom, stepX, stepY, stepV, min) {
