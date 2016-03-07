@@ -264,7 +264,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
       context.stroke();
     }
   }
-  Line.prototype.renderXItem = function(item, context, padding, height, lineHeight, x, first, end) {console.log(first, end)
+  Line.prototype.renderXItem = function(item, context, padding, height, lineHeight, x, first, end) {
     var w = context.measureText(item).width;
     if(!this.option.xOutline && (first || end)) {
       if(first) {

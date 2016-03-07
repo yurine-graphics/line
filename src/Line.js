@@ -264,7 +264,7 @@ class Line {
       context.stroke();
     }
   }
-  renderXItem(item, context, padding, height, lineHeight, x, first, end) {console.log(first, end)
+  renderXItem(item, context, padding, height, lineHeight, x, first, end) {
     var w = context.measureText(item).width;
     if(!this.option.xOutline && (first || end)) {
       if(first) {
