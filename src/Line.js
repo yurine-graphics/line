@@ -164,10 +164,10 @@ class Line {
     context.lineWidth = gridWidth;
     context.strokeStyle = gridColor;
 
-    var stepY = height - padding[0] - padding[2] - lineHeight * 2 - 10;
+    var stepY = height - padding[0] - padding[2] - lineHeight * (this.option.yOutline ? 2 : 1) - 10;
     stepY /= yNum - 1;
 
-    var bottom = padding[2] + lineHeight * 1.5 + 10;
+    var bottom = padding[2] + lineHeight * (this.option.yOutline ? 1.5 : 1) + 10;
     var left = this.renderY(context, padding, width, height, yNum, min, stepY, fontSize, stepV, bottom);
 
     var offsetX1 = context.measureText(this.data.label[0]).width >> 1;
@@ -205,7 +205,18 @@ class Line {
       left = Math.max(left, w);
     }
     for(var i = 0; i < yNum; i++) {
-      var y = height - stepY * i - bottom - (fontSize >> 1);
+      var y;
+      if(!this.option.yOutline && (i == 0 || i == yNum - 1)) {
+        if(i == 0) {
+          y = height - stepY * i - bottom - fontSize;
+        }
+        else {
+          y = padding[0];
+        }
+      }
+      else {
+        y = height - stepY * i - bottom - (fontSize >> 1);
+      }
       var v = vs[i];
       var w = ws[i];
       context.fillText(v, x + left - w, y);
@@ -237,8 +248,8 @@ class Line {
       coords.push([x, y]);
       if(this.option.yLine) {
         context.beginPath();
-        context.moveTo(x, padding[0] + (this.option.yOutline ? 0 : lineHeight >> 1));
-        context.lineTo(x, y - 10 - (this.option.yOutline ? 0 : lineHeight >> 1));
+        context.moveTo(x, padding[0]);
+        context.lineTo(x, y - 10);
         context.stroke();
       }
     }
@@ -248,8 +259,8 @@ class Line {
     coords.push([x, y]);
     if(this.option.yLine) {
       context.beginPath();
-      context.moveTo(x, padding[0] + (this.option.yOutline ? 0 : lineHeight >> 1));
-      context.lineTo(x, y - 10 - (this.option.yOutline ? 0 : lineHeight >> 1));
+      context.moveTo(x, padding[0]);
+      context.lineTo(x, y - 10);
       context.stroke();
     }
   }
