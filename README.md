@@ -38,7 +38,7 @@ npm install yurine-line
      - format:Function 自定义y轴格式化回调
      - color:String 坐标轴字体颜色
      - colors:Array\<String> 自定义绘线颜色数组
-     - areaColor:Array\<String> 自定义区域颜色数组，无区域填空或transparent
+     - areaColors:Array\<String> 自定义区域颜色数组，无区域填空或transparent
      - discRadio:Array\<int> 数据圆点半径，单位px，∈\[0, lineHeight/2]；不设或false、0、null、undefined为不绘制
      - xNum:int 横坐标显示个数，∈\[1, labels.length]
      - yNum:int 纵坐标显示个数，∈\[1, values\[i].length]
