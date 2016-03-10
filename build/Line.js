@@ -84,7 +84,9 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
 
     var max = parseFloat(self.data.value[0][1]) || 0;
     var min = parseFloat(self.data.value[0][1]) || 0;
+    var maxLength = self.data.value[0].length;
     self.data.value.forEach(function(item) {
+      maxLength = Math.max(maxLength, item.length);
       item.forEach(function(item2) {
         var v = parseFloat(item2) || 0;
         max = Math.max(max, v);
@@ -142,16 +144,31 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     if(yNum < 1) {
       yNum = 1;
     }
-    else if(yNum > self.data.value[0].length) {
-      yNum = self.data.value[0].length;
+    else if(yNum > maxLength) {
+      yNum = maxLength;
+    }
+    var xLineNum = parseInt(self.option.xLineNum) || xNum;
+    if(xLineNum < 1) {
+      xLineNum = 1;
+    }
+    else if(xLineNum > self.data.label.length) {
+      xLineNum = self.data.label.length;
+    }
+    var yLineNum = parseInt(self.option.yLineNum) || yNum;
+    if(yLineNum < 1) {
+      yLineNum = 1;
+    }
+    else if(yLineNum > maxLength) {
+      yLineNum = maxLength;
     }
 
     var stepV = Math.abs(max - min) / (yNum - 1);
+    var stepV2 = Math.abs(max - min) / (yLineNum - 1);
 
-    (function(){var _2= self.renderBg(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV);left=_2[0];bottom=_2[1];stepX=_2[2];stepY=_2[3]}).call(this);
+    (function(){var _2= self.renderBg(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV, xLineNum, yLineNum, stepV2);left=_2[0];bottom=_2[1];stepX=_2[2];stepY=_2[3]}).call(this);
     self.renderFg(context, height, lineHeight, lineWidth, left, bottom, padding[0], stepX, stepY, stepV, min);
   }
-  Line.prototype.renderBg = function(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV) {
+  Line.prototype.renderBg = function(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV, xLineNum, yLineNum, stepV2) {
     var color = this.option.color || '#000';
     if(color.charAt(0) != '#' && color.charAt(0) != 'r') {
       color = '#' + color;
@@ -164,26 +181,30 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     context.lineWidth = gridWidth;
     context.strokeStyle = gridColor;
 
-    var stepY = height - padding[0] - padding[2] - lineHeight * (this.option.yOutline ? 2 : 1) - 10;
+    var stepY; var stepY2;
+    stepY = stepY2 = height - padding[0] - padding[2] - lineHeight * (this.option.yOutline ? 2 : 1) - 10;
     stepY /= yNum - 1;
+    stepY2 /= yLineNum - 1;
 
     var bottom = padding[2] + lineHeight * (this.option.yOutline ? 1.5 : 1) + 10;
-    var left = this.renderY(context, padding, width, height, yNum, min, stepY, fontSize, stepV, bottom);
+    var left = this.renderY(context, padding, width, height, yNum, min, stepY, yLineNum, stepY2, fontSize, stepV, bottom);
 
     var offsetX1 = context.measureText(this.data.label[0]).width >> 1;
     var offsetX2 = context.measureText(this.data.label[this.data.label.length - 1]).width >> 1;
     if(this.option.xOutline) {
       left += offsetX1;
     }
-    var stepX = width - padding[1] - padding[3] - left - (this.option.xOutline ? offsetX2 : 0);
+    var stepX; var stepX2;
+    stepX = stepX2 = width - padding[1] - padding[3] - left - (this.option.xOutline ? offsetX2 : 0);
     stepX /= this.data.label.length - 1;
     var increase = (this.data.label.length - 1) / (xNum - 1);
+    var increase2 = (this.data.label.length - 1) / (xLineNum - 1);
 
-    this.renderX(context, padding, height, lineHeight, left, xNum, stepX, increase);
+    this.renderX(context, padding, height, lineHeight, left, xNum, stepX, increase, xLineNum, increase2);
 
     return [left, bottom, stepX, stepY];
   }
-  Line.prototype.renderY = function(context, padding, width, height, yNum, min, stepY, fontSize, stepV, bottom) {
+  Line.prototype.renderY = function(context, padding, width, height, yNum, min, stepY, yLineNum, stepY2, fontSize, stepV, bottom) {
     var left = 0;
     var x = padding[3];
     var fixed = parseInt(this.option.fixed) || 0;
@@ -226,8 +247,8 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     left += 10 + x;
     if(this.option.xLine) {
       context.setLineDash(this.option.yLineDash || [1, 0]);
-      for(var i = 0; i < yNum; i++) {
-        var y = height - stepY * i - bottom;
+      for(var i = 0; i < yLineNum; i++) {
+        var y = height - stepY2 * i - bottom;
         context.beginPath();
         context.moveTo(left, y);
         context.lineTo(width - padding[1], y);
@@ -237,7 +258,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
 
     return left;
   }
-  Line.prototype.renderX = function(context, padding, height, lineHeight, left, xNum, stepX, increase) {
+  Line.prototype.renderX = function(context, padding, height, lineHeight, left, xNum, stepX, increase, xLineNum, increase2) {
     var coords = this.xCoords = [];
     context.setLineDash(this.option.xLineDash || [1, 0]);
     var y = height - lineHeight - padding[2];
@@ -246,18 +267,20 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
       var x = left + i * stepX * Math.floor(increase);
       this.renderXItem(item, context, padding, height, lineHeight, x, i == 0);
       coords.push([x, y]);
-      if(this.option.yLine) {
-        context.beginPath();
-        context.moveTo(x, padding[0]);
-        context.lineTo(x, y - 10);
-        context.stroke();
-      }
     }
     var item = this.data.label[this.data.label.length - 1];
     var x = left + stepX * (this.data.label.length - 1);
     this.renderXItem(item, context, padding, height, lineHeight, x, false, true);
     coords.push([x, y]);
     if(this.option.yLine) {
+      for(var i = 0; i < xLineNum - 1; i++) {
+        var x = left + i * stepX * Math.floor(increase2);
+        context.beginPath();
+        context.moveTo(x, padding[0]);
+        context.lineTo(x, y - 10);
+        context.stroke();
+      }
+      x = left + i * stepX * Math.floor(increase2);
       context.beginPath();
       context.moveTo(x, padding[0]);
       context.lineTo(x, y - 10);

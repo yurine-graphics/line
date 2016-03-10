@@ -41,7 +41,9 @@ npm install yurine-line
      - areaColors:Array\<String> 自定义区域颜色数组，无区域填空或transparent
      - discRadio:Array\<int> 数据圆点半径，单位px，∈\[0, lineHeight/2]；不设或false、0、null、undefined为不绘制
      - xNum:int 横坐标显示个数，∈\[1, labels.length]
-     - yNum:int 纵坐标显示个数，∈\[1, values\[i].length]
+     - yNum:int 纵坐标显示个数，∈\[1, labels.length]
+     - xLineNum: int 横坐标线显示个数，∈\[1, labels.length]
+     - yLineNum: int 纵坐标线显示个数，∈\[1, labels.length]
      - max:Number y轴自定义最大值，空为数据中最大值
      - min:Number y轴自定义最小值，空为数据中最小值
      - fixed:int y轴小数位个数，默认0取整
