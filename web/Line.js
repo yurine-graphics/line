@@ -149,7 +149,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     var stepV = Math.abs(max - min) / (yNum - 1);
 
     (function(){var _2= self.renderBg(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV);left=_2[0];bottom=_2[1];stepX=_2[2];stepY=_2[3]}).call(this);
-    self.renderFg(context, height, lineHeight, lineWidth, left, bottom, stepX, stepY, stepV, min);
+    self.renderFg(context, height, lineHeight, lineWidth, left, bottom, padding[0], stepX, stepY, stepV, min);
   }
   Line.prototype.renderBg = function(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV) {
     var color = this.option.color || '#000';
@@ -279,7 +279,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     }
     return w;
   }
-  Line.prototype.renderFg = function(context, height, lineHeight, lineWidth, left, bottom, stepX, stepY, stepV, min) {
+  Line.prototype.renderFg = function(context, height, lineHeight, lineWidth, left, bottom, top, stepX, stepY, stepV, min) {
     var self = this;
     context.setLineDash([1, 0]);
     var coords = this.coords = [];
@@ -300,16 +300,16 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     coords.forEach(function(item, i) {
       var color = getColor(self.option, i);
       var style = self.option.styles[i];
-      self.renderLine(context, item, i, lineWidth, lineHeight, color, style, height - bottom);
+      self.renderLine(context, item, i, lineWidth, lineHeight, color, style, height - bottom, top);
     });
   }
-  Line.prototype.renderLine = function(context, coords, index, lineWidth, lineHeight, color, style, y) {
+  Line.prototype.renderLine = function(context, coords, index, lineWidth, lineHeight, color, style, y, y0) {
     var self = this;
     context.strokeStyle = color;
     context.lineWidth = lineWidth;
     switch(style) {
       case 'curve':
-        this.renderCurve(context, coords, index, y);
+        this.renderCurve(context, coords, index, y, y0);
         break;
       default:
         this.renderStraight(context, coords, index, y);
@@ -331,7 +331,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
       });
     }
   }
-  Line.prototype.renderCurve = function(context, coords, index, y) {
+  Line.prototype.renderCurve = function(context, coords, index, y, y0) {
     if(coords.length) {
       var clone = [];
       coords.forEach(function(item) {
@@ -350,6 +350,12 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
           (item1[0] + item2[0]) >> 1,
           (item1[1] + item2[1]) >> 1
         ]);
+        //var o = centers[centers.length - 1];
+        //context.fillStyle = '#FF0000';
+        //context.beginPath();
+        //context.arc(o[0], o[1], 3, 0, 360);
+        //context.fill();
+        //context.closePath();
       }
       var curvature = parseFloat(this.option.curvature);
       if(isNaN(curvature)) {
@@ -362,18 +368,38 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
         var item1 = centers[i];
         var item2 = centers[i + 1];
         var item = clone[i + 1];
-        var center = [
+        var cCenter = [
           (item1[0] + item2[0]) >> 1,
           (item1[1] + item2[1]) >> 1
         ];
-        var diffX = (center[0] - item[0]);
-        var diffY = (center[1] - item[1]);
-        ctrols.push([
-          item1[0] - diffX * curvature,
-          item1[1] - diffY * curvature,
-          item2[0] - diffX * curvature,
-          item2[1] - diffY * curvature
-        ]);
+        //context.fillStyle = '#000000';
+        //context.beginPath();
+        //context.arc(cCenter[0], cCenter[1], 5, 0, 360);
+        //context.fill();
+        //context.closePath();
+        var diffX = (cCenter[0] - item[0]);
+        var diffY = (cCenter[1] - item[1]);
+        var x1 = item1[0] - diffX * curvature;
+        var y1 = item1[1] - diffY * curvature;
+        var x2 = item2[0] - diffX * curvature;
+        var y2 = item2[1] - diffY * curvature;
+        if(y1 < y0 || y1 > y) {
+          y1 = y1 < y0 ? y0 : y;
+          var d = coords[i + 1][0] - x1;
+          x1 += d >> 1;
+        }
+        if(y2 < y0 || y2 > y) {
+          y2 = y2 < y0 ? y0 : y;
+          var d = x2 - coords[i + 1][0];
+          x2 -= d >> 1;
+        }
+        ctrols.push([x1, y1, x2, y2]);
+        //context.fillStyle = '#00FF00';
+        //context.beginPath();
+        //context.arc(x1, y1, 3, 0, 360);
+        //context.arc(x2, y2, 3, 0, 360);
+        //context.fill();
+        //context.closePath();
       }
 
       context.beginPath();
