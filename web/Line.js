@@ -248,7 +248,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
       context.setLineDash(this.option.yLineDash || [width, 0]);
       this.gridOnAreaX = [];
       for(var i = 0; i < yLineNum; i++) {
-        var y = height - stepY2 * i - bottom;
+        var y = Math.round(height - stepY2 * i - bottom);
         if(this.option.gridOnArea) {
           this.gridOnAreaX.push([left, y, width - padding[1], y]);
         }
@@ -280,7 +280,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     if(this.option.yLine) {
       this.gridOnAreaY = [];
       for(var i = 0; i < xLineNum - 1; i++) {
-        var x = left + i * stepX * Math.floor(increase2);
+        var x = Math.round(left + i * stepX * Math.floor(increase2));
         if(this.option.gridOnArea) {
           this.gridOnAreaY.push([x, padding[0], x, y - 10]);
         }
@@ -291,7 +291,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
           context.stroke();
         }
       }
-      x = left + i * stepX * Math.floor(increase2);
+      x = Math.round(left + i * stepX * Math.floor(increase2));
       if(this.option.gridOnArea) {
         this.gridOnAreaY.push([x, padding[0], x, y - 10]);
       }
