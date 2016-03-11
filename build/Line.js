@@ -163,12 +163,11 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     }
 
     var stepV = Math.abs(max - min) / (yNum - 1);
-    var stepV2 = Math.abs(max - min) / (yLineNum - 1);
 
-    (function(){var _2= self.renderBg(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV, xLineNum, yLineNum, stepV2);left=_2[0];bottom=_2[1];stepX=_2[2];stepY=_2[3]}).call(this);
-    self.renderFg(context, height, lineHeight, lineWidth, left, bottom, padding[0], stepX, stepY, stepV, min);
+    (function(){var _2= self.renderBg(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV, xLineNum, yLineNum);left=_2[0];bottom=_2[1];stepX=_2[2];stepY=_2[3]}).call(this);
+    self.renderFg(context, height, lineHeight, lineWidth, left, bottom, padding[0], stepX, stepY, stepV, min, xLineNum, yLineNum);
   }
-  Line.prototype.renderBg = function(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV, xLineNum, yLineNum, stepV2) {
+  Line.prototype.renderBg = function(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV, xLineNum, yLineNum) {
     var color = this.option.color || '#000';
     if(color.charAt(0) != '#' && color.charAt(0) != 'r') {
       color = '#' + color;
@@ -177,9 +176,9 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     if(gridColor.charAt(0) != '#' && gridColor.charAt(0) != 'r') {
       gridColor = '#' + gridColor;
     }
-    context.fillStyle = color;
-    context.lineWidth = gridWidth;
-    context.strokeStyle = gridColor;
+    context.fillStyle = this.option.color = color;
+    context.lineWidth = this.option.gridWidth = gridWidth;
+    context.strokeStyle = this.option.gridColor = gridColor;
 
     var stepY; var stepY2;
     stepY = stepY2 = height - padding[0] - padding[2] - lineHeight * (this.option.yOutline ? 2 : 1) - 10;
@@ -246,13 +245,19 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
 
     left += 10 + x;
     if(this.option.xLine) {
-      context.setLineDash(this.option.yLineDash || [1, 0]);
+      context.setLineDash(this.option.yLineDash || [width, 0]);
+      this.gridOnAreaX = [];
       for(var i = 0; i < yLineNum; i++) {
         var y = height - stepY2 * i - bottom;
-        context.beginPath();
-        context.moveTo(left, y);
-        context.lineTo(width - padding[1], y);
-        context.stroke();
+        if(this.option.gridOnArea) {
+          this.gridOnAreaX.push([left, y, width - padding[1], y]);
+        }
+        else {
+          context.beginPath();
+          context.moveTo(left, y);
+          context.lineTo(width - padding[1], y);
+          context.stroke();
+        }
       }
     }
 
@@ -273,18 +278,29 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     this.renderXItem(item, context, padding, height, lineHeight, x, false, true);
     coords.push([x, y]);
     if(this.option.yLine) {
+      this.gridOnAreaY = [];
       for(var i = 0; i < xLineNum - 1; i++) {
         var x = left + i * stepX * Math.floor(increase2);
+        if(this.option.gridOnArea) {
+          this.gridOnAreaY.push([x, padding[0], x, y - 10]);
+        }
+        else {
+          context.beginPath();
+          context.moveTo(x, padding[0]);
+          context.lineTo(x, y - 10);
+          context.stroke();
+        }
+      }
+      x = left + i * stepX * Math.floor(increase2);
+      if(this.option.gridOnArea) {
+        this.gridOnAreaY.push([x, padding[0], x, y - 10]);
+      }
+      else {
         context.beginPath();
         context.moveTo(x, padding[0]);
         context.lineTo(x, y - 10);
         context.stroke();
       }
-      x = left + i * stepX * Math.floor(increase2);
-      context.beginPath();
-      context.moveTo(x, padding[0]);
-      context.lineTo(x, y - 10);
-      context.stroke();
     }
   }
   Line.prototype.renderXItem = function(item, context, padding, height, lineHeight, x, first, end) {
@@ -302,7 +318,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     }
     return w;
   }
-  Line.prototype.renderFg = function(context, height, lineHeight, lineWidth, left, bottom, top, stepX, stepY, stepV, min) {
+  Line.prototype.renderFg = function(context, height, lineHeight, lineWidth, left, bottom, top, stepX, stepY, stepV, min, xLineNum, yLineNum) {
     var self = this;
     context.setLineDash([1, 0]);
     var coords = this.coords = [];
@@ -323,16 +339,16 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     coords.forEach(function(item, i) {
       var color = getColor(self.option, i);
       var style = self.option.styles[i];
-      self.renderLine(context, item, i, lineWidth, lineHeight, color, style, height - bottom, top);
+      self.renderLine(context, item, i, lineWidth, lineHeight, color, style, height - bottom, top, xLineNum, yLineNum);
     });
   }
-  Line.prototype.renderLine = function(context, coords, index, lineWidth, lineHeight, color, style, y, y0) {
+  Line.prototype.renderLine = function(context, coords, index, lineWidth, lineHeight, color, style, y, y0, xLineNum, yLineNum) {
     var self = this;
     context.strokeStyle = color;
     context.lineWidth = lineWidth;
     switch(style) {
       case 'curve':
-        this.renderCurve(context, coords, index, y, y0);
+        this.renderCurve(context, coords, index, y, y0, color, lineWidth, xLineNum, yLineNum);
         break;
       default:
         this.renderStraight(context, coords, index, y);
@@ -354,7 +370,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
       });
     }
   }
-  Line.prototype.renderCurve = function(context, coords, index, y, y0) {
+  Line.prototype.renderCurve = function(context, coords, index, y, y0, color, lineWidth, xLineNum, yLineNum) {
     if(coords.length) {
       var clone = [];
       coords.forEach(function(item) {
@@ -437,7 +453,10 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
       }
       var ctrl = ctrols[i - 2];
       context.quadraticCurveTo(ctrl[2], ctrl[3], clone[i][0], clone[i][1]);
-      context.stroke();
+      if(!this.option.gridOnArea) {
+        context.stroke();
+      }
+
       var fill = this.option.areaColors[index];
       if(fill && fill != 'transparent') {
         context.fillStyle = fill;
@@ -447,6 +466,48 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
         context.fill();
       }
       context.closePath();
+
+      if(this.option.gridOnArea) {
+        if(this.option.xLine) {
+          context.fillStyle = this.option.color;
+          context.lineWidth = this.option.gridWidth;
+          context.strokeStyle = this.option.gridColor;
+          for(var i = 0; i < yLineNum; i++) {
+            var item = this.gridOnAreaX[i];
+            context.beginPath();
+            context.moveTo(item[0], item[1]);
+            context.lineTo(item[2], item[3]);
+            context.stroke();
+          }
+        }
+        if(this.option.yLine) {
+          context.fillStyle = this.option.color;
+          context.lineWidth = this.option.gridWidth;
+          context.strokeStyle = this.option.gridColor;
+          for(var i = 0; i < xLineNum; i++) {
+            var item = this.gridOnAreaY[i];
+            context.beginPath();
+            context.moveTo(item[0], item[1]);
+            context.lineTo(item[2], item[3]);
+            context.stroke();
+          }
+        }
+        context.strokeStyle = color;
+        context.lineWidth = lineWidth;
+        context.beginPath();
+        var start = clone[0];
+        var end = clone[clone.length - 1];
+        context.moveTo(start[0], start[1]);
+        context.quadraticCurveTo(ctrols[0][0], ctrols[0][1], clone[1][0], clone[1][1]);
+        for(var i = 2, len = clone.length; i < len - 1; i++) {
+          var left = ctrols[i - 2];
+          var right = ctrols[i - 1];
+          context.bezierCurveTo(left[2], left[3], right[0], right[1], clone[i][0], clone[i][1]);
+        }
+        var ctrl = ctrols[i - 2];
+        context.quadraticCurveTo(ctrl[2], ctrl[3], clone[i][0], clone[i][1]);
+        context.stroke();
+      }
     }
   }
   Line.prototype.renderStraight = function(context, coords, index, y) {

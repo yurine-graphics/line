@@ -51,7 +51,7 @@
     search.gridWidth = search.gridWidth || 1;
     search.yLineDash = search.yLineDash || [1];
     search.xLineDash = search.xLineDash || [4, 4];
-    search.areaColors = search.areaColors || ['rgba(232, 246, 252, 0.5)'];
+    search.areaColors = search.areaColors || ['rgba(232, 246, 252, 0.4)'];
 
     var textarea = document.querySelector('textarea');
     textarea.value = JSON.stringify(search, null, '  ');
@@ -75,9 +75,10 @@
       curvature: search.curvature,
       xNum: 10,
       yNum: 5,
-      gridWidth: search.gridWidth,
-      yLineDash: search.yLineDash,
-      xLineDash: search.xLineDash,
+      gridWidth: 2,
+      gridColor: '#000',
+      yLineDash: [1000,0],
+      xLineDash: [1000,0],
       areaColors: search.areaColors,
       xLine: true,
       yLine: true,
@@ -85,7 +86,8 @@
       yOutline: true,
       fixed: 2,
       padding: 0,
-      percent: true
+      percent: true,
+      gridOnArea: true
     });
   });
 </script>

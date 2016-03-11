@@ -52,6 +52,7 @@ npm install yurine-line
      - curvature:float 曲线曲率，∈\[0, 1]
      - xOutline:Boolean 横线是否出头
      - yOutline:Boolean 纵线是否出头
+     - gridOnArea:Boolean 背景网格线显示在area上
  * getCoords():Array\<Array> 获取绘制点的坐标，是个二维数组，包含所有线条
  * getCoord(index:int):Array\<Array\<x:Number, y:Number>> 获取第index线条的所有坐标，-1从末尾起
  * getPoint(index:int, j:int):Array\<x:Number, y:Number> 获取第index线条的第j点的纵坐标，-1从末尾起
