@@ -245,7 +245,7 @@ class Line {
 
     left += 10 + x;
     if(this.option.xLine) {
-      context.setLineDash(this.option.yLineDash || [width, 0]);
+      context.setLineDash && context.setLineDash(this.option.yLineDash || [width, 0]);
       this.gridOnAreaX = [];
       for(var i = 0; i < yLineNum; i++) {
         var y = Math.round(height - stepY2 * i - bottom);
@@ -265,7 +265,7 @@ class Line {
   }
   renderX(context, padding, height, lineHeight, left, xNum, stepX, increase, xLineNum, increase2) {
     var coords = this.xCoords = [];
-    context.setLineDash(this.option.xLineDash || [1, 0]);
+    context.setLineDash && context.setLineDash(this.option.xLineDash || [1, 0]);
     var y = height - lineHeight - padding[2];
     for(var i = 0; i < xNum - 1; i++) {
       var item = this.data.label[i * Math.floor(increase)];
@@ -320,7 +320,7 @@ class Line {
   }
   renderFg(context, height, lineHeight, lineWidth, left, bottom, top, stepX, stepY, stepV, min, xLineNum, yLineNum) {
     var self = this;
-    context.setLineDash([1, 0]);
+    context.setLineDash && context.setLineDash([1, 0]);
     var coords = this.coords = [];
     self.data.value.forEach(function(item) {
       var arr = [];
