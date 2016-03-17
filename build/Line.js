@@ -82,8 +82,8 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
       }
     }
 
-    var max = parseFloat(self.data.value[0][1]) || 0;
-    var min = parseFloat(self.data.value[0][1]) || 0;
+    var max = parseFloat(self.data.value[0][0]) || 0;
+    var min = parseFloat(self.data.value[0][0]) || 0;
     var maxLength = self.data.value[0].length;
     self.data.value.forEach(function(item) {
       maxLength = Math.max(maxLength, item.length);
@@ -162,10 +162,13 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
       yLineNum = maxLength;
     }
 
-    var stepV = Math.abs(max - min) / (yNum - 1);
+    var stepV = Math.abs(max - min) / Math.max(1, (yNum - 1));
 
     (function(){var _2= self.renderBg(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV, xLineNum, yLineNum);left=_2[0];bottom=_2[1];stepX=_2[2];stepY=_2[3]}).call(this);
-    self.renderFg(context, height, lineHeight, lineWidth, left, bottom, padding[0], stepX, stepY, stepV, min, xLineNum, yLineNum);
+    if(yNum == 1) {
+      stepV = stepY >> 1;
+    }
+    self.renderFg(context, height, lineHeight, lineWidth, left, bottom, padding[0], width - padding[3] - padding[1], stepX, stepY, stepV, min, xLineNum, yLineNum);
   }
   Line.prototype.renderBg = function(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV, xLineNum, yLineNum) {
     var color = this.option.color || '#000';
@@ -182,8 +185,12 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
 
     var stepY; var stepY2;
     stepY = stepY2 = height - padding[0] - padding[2] - lineHeight * (this.option.yOutline ? 2 : 1) - 10;
-    stepY /= yNum - 1;
-    stepY2 /= yLineNum - 1;
+    if(yNum > 1) {
+      stepY /= yNum - 1;
+    }
+    if(yLineNum > 1) {
+      stepY2 /= yLineNum - 1;
+    }
 
     var bottom = padding[2] + lineHeight * (this.option.yOutline ? 1.5 : 1) + 10;
     var left = this.renderY(context, padding, width, height, yNum, min, stepY, yLineNum, stepY2, fontSize, stepV, bottom);
@@ -193,9 +200,11 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     if(this.option.xOutline) {
       left += offsetX1;
     }
-    var stepX; var stepX2;
-    stepX = stepX2 = width - padding[1] - padding[3] - left - (this.option.xOutline ? offsetX2 : 0);
-    stepX /= this.data.label.length - 1;
+    var stepX;
+    stepX = width - padding[1] - padding[3] - left - (this.option.xOutline ? offsetX2 : 0);
+    if(this.data.label.length > 1) {
+      stepX /= this.data.label.length - 1;
+    }
     var increase = (this.data.label.length - 1) / (xNum - 1);
     var increase2 = (this.data.label.length - 1) / (xLineNum - 1);
 
@@ -239,6 +248,10 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
       }
       var v = vs[i];
       var w = ws[i];
+      //只有1个
+      if(yNum == 1) {
+        y = padding[0] + (stepY >> 1);
+      }
       context.fillText(v, x + left - w, y);
       coords.push([x + left - (w >> 1), y]);
     }
@@ -318,29 +331,63 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     }
     return w;
   }
-  Line.prototype.renderFg = function(context, height, lineHeight, lineWidth, left, bottom, top, stepX, stepY, stepV, min, xLineNum, yLineNum) {
+  Line.prototype.renderFg = function(context, height, lineHeight, lineWidth, left, bottom, top, right, stepX, stepY, stepV, min, xLineNum, yLineNum) {
     var self = this;
     context.setLineDash && context.setLineDash([1, 0]);
     var coords = this.coords = [];
     self.data.value.forEach(function(item) {
       var arr = [];
       item.forEach(function(item2, i) {
-        var v = item2;
         if(item2 === null || item2 === undefined) {
           arr.push(null);
           return;
         }
         var x = left + i * stepX;
-        var y = height - bottom - (v - min) * stepY / stepV;
+        var y = height - bottom - (item2 - min) * stepY / stepV;
         arr.push([x, y]);
       });
       coords.push(arr);
     });
+    if(coords.length == 1 && coords[0].length == 1) {
+      var color = getColor(self.option, 0);
+      var item = coords[0];
+      item[0][1] = height - bottom - stepV;
+      self.renderOne(context, item[0], lineWidth, lineHeight, color, right, height - bottom);
+      return;
+    }
     coords.forEach(function(item, i) {
       var color = getColor(self.option, i);
       var style = self.option.styles[i];
       self.renderLine(context, item, i, lineWidth, lineHeight, color, style, height - bottom, top, xLineNum, yLineNum);
     });
+  }
+  Line.prototype.renderOne = function(context, item, lineWidth, lineHeight, color, right, bottom) {
+    var self = this;
+    context.strokeStyle = color;
+    context.lineWidth = lineWidth;
+    context.beginPath();
+    context.moveTo(item[0], item[1]);
+    context.lineTo(right, item[1]);
+    context.stroke();
+    var fill = this.option.areaColors[0];
+    if(fill && fill != 'transparent') {
+      context.fillStyle = fill;
+      context.lineTo(right, bottom);
+      context.lineTo(item[0], bottom);
+      context.lineTo(item[0], item[1]);
+      context.fill();
+    }
+    context.closePath();
+    if(self.option.discRadio) {
+      var discRadio = parseInt(self.option.discRadio) || 1;
+      discRadio = Math.max(discRadio, 1);
+      discRadio = Math.min(discRadio, lineHeight >> 1);
+      context.fillStyle = color;
+      context.beginPath();
+      context.arc(item[0], item[1], discRadio, 0, (Math.PI/180)*360);
+      context.fill();
+      context.closePath();
+    }
   }
   Line.prototype.renderLine = function(context, coords, index, lineWidth, lineHeight, color, style, y, y0, xLineNum, yLineNum) {
     var self = this;
@@ -348,10 +395,10 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     context.lineWidth = lineWidth;
     switch(style) {
       case 'curve':
-        this.renderCurve(context, coords, index, y, y0, color, lineWidth, xLineNum, yLineNum);
+        self.renderCurve(context, coords, index, y, y0, color, lineWidth, xLineNum, yLineNum);
         break;
       default:
-        this.renderStraight(context, coords, index, y);
+        self.renderStraight(context, coords, index, y);
         break;
     }
     if(self.option.discRadio) {
