@@ -38,9 +38,9 @@
     search = search.replace(/^\?/, '');
     search = JSON.parse(decodeURIComponent(search) || '{}') || {};
     search.data = search.data || {
-      label:  ['0', '1', '2', '3'],
+      label:  ['0', '1'],
       value: [
-        [0.04, 0.1, 0.1, 0.05]
+        [0.04, 0.1]
       ]
     };
     search.styles = search.styles || ['curve', 'straight'];

@@ -492,14 +492,19 @@ class Line {
       var start = clone[0];
       var end = clone[clone.length - 1];
       context.moveTo(start[0], start[1]);
-      context.quadraticCurveTo(ctrols[0][0], ctrols[0][1], clone[1][0], clone[1][1]);
-      for(var i = 2, len = clone.length; i < len - 1; i++) {
-        var left = ctrols[i - 2];
-        var right = ctrols[i - 1];
-        context.bezierCurveTo(left[2], left[3], right[0], right[1], clone[i][0], clone[i][1]);
+      if(clone.length > 2) {
+        context.quadraticCurveTo(ctrols[0][0], ctrols[0][1], clone[1][0], clone[1][1]);
+        for(var i = 2, len = clone.length; i < len - 1; i++) {
+          var left = ctrols[i - 2];
+          var right = ctrols[i - 1];
+          context.bezierCurveTo(left[2], left[3], right[0], right[1], clone[i][0], clone[i][1]);
+        }
+        var ctrl = ctrols[i - 2];
+        context.quadraticCurveTo(ctrl[2], ctrl[3], clone[i][0], clone[i][1]);
       }
-      var ctrl = ctrols[i - 2];
-      context.quadraticCurveTo(ctrl[2], ctrl[3], clone[i][0], clone[i][1]);
+      else {
+        context.lineTo(end[0], end[1]);
+      }
       if(!this.option.gridOnArea) {
         context.stroke();
       }
@@ -545,14 +550,19 @@ class Line {
         var start = clone[0];
         var end = clone[clone.length - 1];
         context.moveTo(start[0], start[1]);
-        context.quadraticCurveTo(ctrols[0][0], ctrols[0][1], clone[1][0], clone[1][1]);
-        for(var i = 2, len = clone.length; i < len - 1; i++) {
-          var left = ctrols[i - 2];
-          var right = ctrols[i - 1];
-          context.bezierCurveTo(left[2], left[3], right[0], right[1], clone[i][0], clone[i][1]);
+        if(clone.length > 2) {
+          context.quadraticCurveTo(ctrols[0][0], ctrols[0][1], clone[1][0], clone[1][1]);
+          for(var i = 2, len = clone.length; i < len - 1; i++) {
+            var left = ctrols[i - 2];
+            var right = ctrols[i - 1];
+            context.bezierCurveTo(left[2], left[3], right[0], right[1], clone[i][0], clone[i][1]);
+          }
+          var ctrl = ctrols[i - 2];
+          context.quadraticCurveTo(ctrl[2], ctrl[3], clone[i][0], clone[i][1]);
         }
-        var ctrl = ctrols[i - 2];
-        context.quadraticCurveTo(ctrl[2], ctrl[3], clone[i][0], clone[i][1]);
+        else {
+          context.lineTo(end[0], end[1]);
+        }
         context.stroke();
       }
     }
