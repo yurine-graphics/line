@@ -38,9 +38,9 @@
     search = search.replace(/^\?/, '');
     search = JSON.parse(decodeURIComponent(search) || '{}') || {};
     search.data = search.data || {
-      label:  ['0', '1'],
+      label:  ['0', '1', '2', '3'],
       value: [
-        [0.04, 0.1]
+        [0.04, 0.1, 0.1, 0.05]
       ]
     };
     search.styles = search.styles || ['curve', 'straight'];
@@ -79,7 +79,7 @@
       gridColor: '#000',
       yLineDash: [1000,0],
       xLineDash: [1000,0],
-      colors: ['#FF0000'],
+      colors: ['rgb(255,0,0)'],
       areaColors: search.areaColors,
       xLine: true,
       yLine: true,
