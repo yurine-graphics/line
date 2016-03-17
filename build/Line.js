@@ -288,7 +288,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     }
     var item = this.data.label[this.data.label.length - 1];
     var x = left + stepX * (this.data.label.length - 1);
-    this.renderXItem(item, context, padding, height, lineHeight, x, false, true);
+    this.renderXItem(item, context, padding, height, lineHeight, x, i == 0, true);
     coords.push([x, y]);
     if(this.option.yLine) {
       this.gridOnAreaY = [];

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>line</title>
-  <meta name="viewport" content="target-densitydpi=device-dpi,width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=0"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=0"/>
   <style>
     html,body{
       font:12px/1.5 Arial;
@@ -38,9 +38,9 @@
     search = search.replace(/^\?/, '');
     search = JSON.parse(decodeURIComponent(search) || '{}') || {};
     search.data = search.data || {
-      label:  ['0', '1', '2', '3'],
+      label:  ['abcdefg'],
       value: [
-        [0.04, 0.1, 0.1, 0.05]
+        [0.04]
       ]
     };
     search.styles = search.styles || ['curve', 'straight'];
@@ -83,7 +83,7 @@
       areaColors: search.areaColors,
       xLine: true,
       yLine: true,
-      xOutline: true,
+      xOutline: false,
       yOutline: true,
       fixed: 2,
       padding: 0,
