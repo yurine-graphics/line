@@ -71,6 +71,10 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     lineWidth = Math.max(lineWidth, 1);
     lineWidth = Math.min(lineWidth, minSize >> 2);
 
+    var breakLineWidth = parseInt(self.option.breakLineWidth) || 1;
+    breakLineWidth = Math.max(breakLineWidth, 1);
+    breakLineWidth = Math.min(breakLineWidth, minSize >> 2);
+
     var gridWidth = parseInt(self.option.gridWidth) || 1;
     gridWidth = Math.max(gridWidth, 1);
     gridWidth = Math.min(gridWidth, minSize >> 2);
@@ -133,12 +137,19 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     font = fontStyle + ' ' + fontVariant + ' ' + fontWeight + ' ' + fontSize + 'px/' + lineHeight + 'px ' + fontFamily;
     context.font = font;
 
-    var xNum = parseInt(self.option.xNum) || self.data.label.length;
+    var len = self.data.label.length || 0;
+    self.data.value.forEach(function(item, i) {
+      if(item.length > len) {
+        item.splice(len);
+      }
+    });
+
+    var xNum = parseInt(self.option.xNum) || len;
     if(xNum < 1) {
       xNum = 1;
     }
-    else if(xNum > self.data.label.length) {
-      xNum = self.data.label.length;
+    else if(xNum > len) {
+      xNum = len;
     }
     var yNum = parseInt(self.option.yNum) || Math.floor((height - padding[0] - padding[2] - lineHeight * 2 - 20) / lineHeight);
     if(yNum < 1) {
@@ -151,8 +162,8 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     if(xLineNum < 1) {
       xLineNum = 1;
     }
-    else if(xLineNum > self.data.label.length) {
-      xLineNum = self.data.label.length;
+    else if(xLineNum > len) {
+      xLineNum = len;
     }
     var yLineNum = parseInt(self.option.yLineNum) || yNum;
     if(yLineNum < 1) {
@@ -168,7 +179,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     if(yNum == 1) {
       stepV = stepY >> 1;
     }
-    self.renderFg(context, height, lineHeight, lineWidth, left, bottom, padding[0], width - padding[3] - padding[1], stepX, stepY, stepV, min, xLineNum, yLineNum);
+    self.renderFg(context, height, lineHeight, lineWidth, breakLineWidth, left, bottom, padding[0], width - padding[3] - padding[1], stepX, stepY, stepV, min, xLineNum, yLineNum);
   }
   Line.prototype.renderBg = function(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV, xLineNum, yLineNum) {
     var color = this.option.color || '#000';
@@ -331,7 +342,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     }
     return w;
   }
-  Line.prototype.renderFg = function(context, height, lineHeight, lineWidth, left, bottom, top, right, stepX, stepY, stepV, min, xLineNum, yLineNum) {
+  Line.prototype.renderFg = function(context, height, lineHeight, lineWidth, breakLineWidth, left, bottom, top, right, stepX, stepY, stepV, min, xLineNum, yLineNum) {
     var self = this;
     context.setLineDash && context.setLineDash([1, 0]);
     var coords = this.coords = [];
@@ -348,23 +359,29 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
       });
       coords.push(arr);
     });
+    var breakColor = self.option.breakColor || '#000';
+    if(breakColor.charAt(0) != '#' && breakColor.charAt(0) != 'r') {
+      breakColor = '#' + color;
+    }
+    var breakDash = self.option.breakDash || [4, 4];
     if(coords.length == 1 && coords[0].length == 1) {
       var color = getColor(self.option, 0);
       var item = coords[0];
       item[0][1] = height - bottom - stepV;
-      self.renderOne(context, item[0], lineWidth, lineHeight, color, right, height - bottom);
+      self.renderOne(context, item[0], breakLineWidth, lineHeight, breakColor, breakDash, right, height - bottom);
       return;
     }
     coords.forEach(function(item, i) {
       var color = getColor(self.option, i);
       var style = self.option.styles[i];
-      self.renderLine(context, item, i, lineWidth, lineHeight, color, style, height - bottom, top, xLineNum, yLineNum);
+      self.renderLine(context, item, i, lineWidth, breakLineWidth, lineHeight, color, breakColor, breakDash, style, height - bottom, top, right, xLineNum, yLineNum);
     });
   }
-  Line.prototype.renderOne = function(context, item, lineWidth, lineHeight, color, right, bottom) {
+  Line.prototype.renderOne = function(context, item, lineWidth, lineHeight, color, lineDash, right, bottom) {
     var self = this;
     context.strokeStyle = color;
     context.lineWidth = lineWidth;
+    context.setLineDash(lineDash);
     context.beginPath();
     context.moveTo(item[0], item[1]);
     context.lineTo(right, item[1]);
@@ -389,16 +406,14 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
       context.closePath();
     }
   }
-  Line.prototype.renderLine = function(context, coords, index, lineWidth, lineHeight, color, style, y, y0, xLineNum, yLineNum) {
+  Line.prototype.renderLine = function(context, coords, index, lineWidth, breakLineWidth, lineHeight, color, breakColor, breakDash, style, y, y0, right, xLineNum, yLineNum) {
     var self = this;
-    context.strokeStyle = color;
-    context.lineWidth = lineWidth;
     switch(style) {
       case 'curve':
-        self.renderCurve(context, coords, index, y, y0, color, lineWidth, xLineNum, yLineNum);
+        self.renderCurve(context, coords, index, y, y0, right, color, lineWidth, breakLineWidth, breakColor, breakDash, xLineNum, yLineNum);
         break;
       default:
-        self.renderStraight(context, coords, index, y);
+        self.renderStraight(context, coords, index, y, right, color, lineWidth, breakLineWidth, breakColor, breakDash);
         break;
     }
     if(self.option.discRadio) {
@@ -417,16 +432,14 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
       });
     }
   }
-  Line.prototype.renderCurve = function(context, coords, index, y, y0, color, lineWidth, xLineNum, yLineNum) {
+  Line.prototype.renderCurve = function(context, coords, index, y, y0, x, color, lineWidth, breakLineWidth, breakColor, breakDash, xLineNum, yLineNum) {
     if(coords.length) {
       var clone = [];
       coords.forEach(function(item) {
         if(item === null || item === undefined) {
           return;
         }
-        if(item !== null && item !== undefined) {
-          clone.push(item);
-        }
+        clone.push(item);
       });
       var centers = [];
       for(var i = 0, len = clone.length; i < len - 1; i++) {
@@ -436,12 +449,12 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
           (item1[0] + item2[0]) >> 1,
           (item1[1] + item2[1]) >> 1
         ]);
-        //var o = centers[centers.length - 1];
-        //context.fillStyle = '#FF0000';
-        //context.beginPath();
-        //context.arc(o[0], o[1], 3, 0, 360);
-        //context.fill();
-        //context.closePath();
+        var o = centers[centers.length - 1];
+        // context.fillStyle = '#FF9900';
+        // context.beginPath();
+        // context.arc(o[0], o[1], 6, 0, 360);
+        // context.fill();
+        // context.closePath();
       }
       var curvature = parseFloat(this.option.curvature);
       if(isNaN(curvature)) {
@@ -458,72 +471,145 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
           (item1[0] + item2[0]) >> 1,
           (item1[1] + item2[1]) >> 1
         ];
-        //context.fillStyle = '#000000';
-        //context.beginPath();
-        //context.arc(cCenter[0], cCenter[1], 5, 0, 360);
-        //context.fill();
-        //context.closePath();
+        // context.fillStyle = '#000000';
+        // context.beginPath();
+        // context.arc(cCenter[0], cCenter[1], 5, 0, 360);
+        // context.fill();
+        // context.closePath();
         var diffX = (cCenter[0] - item[0]);
         var diffY = (cCenter[1] - item[1]);
         var x1 = item1[0] - diffX * curvature;
         var y1 = item1[1] - diffY * curvature;
         var x2 = item2[0] - diffX * curvature;
         var y2 = item2[1] - diffY * curvature;
+        //防止超出范围
         if(y1 < y0 || y1 > y) {
           y1 = y1 < y0 ? y0 : y;
-          var d = coords[i + 1][0] - x1;
+          var d = clone[i + 1][0] - x1;
           x1 += d >> 1;
         }
         if(y2 < y0 || y2 > y) {
           y2 = y2 < y0 ? y0 : y;
-          var d = x2 - coords[i + 1][0];
+          var d = x2 - clone[i + 1][0];
           x2 -= d >> 1;
         }
         ctrols.push([x1, y1, x2, y2]);
-        //context.fillStyle = '#00FF00';
-        //context.beginPath();
-        //context.arc(x1, y1, 3, 0, 360);
-        //context.arc(x2, y2, 3, 0, 360);
-        //context.fill();
-        //context.closePath();
+        // context.fillStyle = '#00FF00';
+        // context.beginPath();
+        // context.arc(x1, y1, 3, 0, 360);
+        // context.arc(x2, y2, 3, 0, 360);
+        // context.fill();
+        // context.closePath();
       }
 
       context.beginPath();
       var start = clone[0];
       var end = clone[clone.length - 1];
-      context.moveTo(start[0], start[1]);
-      if(clone.length > 2) {
-        context.quadraticCurveTo(ctrols[0][0], ctrols[0][1], clone[1][0], clone[1][1]);
-        for(var i = 2, len = clone.length; i < len - 1; i++) {
-          var left = ctrols[i - 2];
-          var right = ctrols[i - 1];
-          context.bezierCurveTo(left[2], left[3], right[0], right[1], clone[i][0], clone[i][1]);
+      var fill = this.option.areaColors[index];
+      if(fill == 'transparent') {
+        fill = null;
+      }
+      if(fill && fill.charAt(0) != '#' && fill.charAt(0) != 'r') {
+        fill = '#' + color;
+      }
+      if(fill) {
+        context.fillStyle = fill;
+      }
+      //从第一个非空点开始,防止前置有空数据
+      for(var i = 0, len = this.data.label.length; i < len; i++) {
+        if(coords[i]) {
+          break;
         }
-        var ctrl = ctrols[i - 2];
-        context.quadraticCurveTo(ctrl[2], ctrl[3], clone[i][0], clone[i][1]);
+      }
+      var begin = clone[0];
+      var last = clone[0];
+      context.moveTo(last[0], last[1]);
+      var count = 0;
+      var isPrevBreak = false;
+      for(++i; i < len - 1; i++) {
+        if(coords[i]) {
+          last = coords[i];
+          if(isPrevBreak) {
+            begin = coords[i];
+            context.strokeStyle = color;
+            context.lineWidth = lineWidth;
+            context.setLineDash([1, 0]);
+            context.moveTo(coords[i][0], coords[i][1]);
+          }
+          else {
+            var left = ctrols[i - 2 - count];
+            var right = ctrols[i - 1 - count];
+            if(right) {
+              context.bezierCurveTo(left[2], left[3], right[0], right[1], coords[i][0], coords[i][1]);
+            }
+            else {
+              context.quadraticCurveTo(left[2], left[3], coords[i][0], coords[i][1]);
+            }
+          }
+          isPrevBreak = false;
+        }
+        else {
+          context.stroke();
+          if(fill && last != begin) {
+            context.lineTo(last[0], y);
+            context.lineTo(begin[0], y);
+            context.lineTo(begin[0], begin[1]);
+            context.fill();
+          }
+          context.closePath();
+          context.beginPath();
+          context.moveTo(last[0], last[1]);
+          count++;
+          //找到连续空白结尾
+          for(var next = i + 1; next < len - 1; next++) {
+            if(coords[next]) {
+              break;
+            }
+            else {
+              count++;
+            }
+          }
+          i = next - 1;
+          context.strokeStyle = breakColor;
+          context.lineWidth = breakLineWidth;
+          context.setLineDash(breakDash);
+          context.lineTo(coords[next][0], coords[next][1]);
+          context.stroke();
+          context.closePath();
+          context.beginPath();
+          isPrevBreak = true;
+        }
+      }
+      if(coords[i]) {
+        if(!isPrevBreak) {
+          var ctrl = ctrols[i - 2 - count];
+          context.quadraticCurveTo(ctrl[2], ctrl[3], coords[i][0], coords[i][1]);
+        }
       }
       else {
-        context.lineTo(end[0], end[1]);
-      }
-      if(!this.option.gridOnArea) {
         context.stroke();
+        if(fill && last != begin) {
+          context.lineTo(last[0], y);
+          context.lineTo(begin[0], y);
+          context.lineTo(begin[0], begin[1]);
+          context.fill();
+        }
+        context.closePath();
+        context.beginPath();
+        context.moveTo(last[0], last[1]);
+        context.strokeStyle = breakColor;
+        context.lineWidth = breakLineWidth;
+        context.setLineDash(breakDash);
+        context.lineTo(x, last[1]);
       }
-
-      var fill = this.option.areaColors[index];
-      if(fill && fill != 'transparent') {
-        context.fillStyle = fill;
-        context.lineTo(end[0], y);
-        context.lineTo(start[0], y);
-        context.lineTo(start[0], start[1]);
-        context.fill();
-      }
+      context.stroke();
       context.closePath();
 
       if(this.option.gridOnArea) {
         if(this.option.xLine) {
-          context.fillStyle = this.option.color;
           context.lineWidth = this.option.gridWidth;
           context.strokeStyle = this.option.gridColor;
+          context.setLineDash(this.option.xLineDash || [1, 0]);
           for(var i = 0; i < yLineNum; i++) {
             var item = this.gridOnAreaX[i];
             context.beginPath();
@@ -533,9 +619,9 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
           }
         }
         if(this.option.yLine) {
-          context.fillStyle = this.option.color;
           context.lineWidth = this.option.gridWidth;
           context.strokeStyle = this.option.gridColor;
+          context.setLineDash(this.option.yLineDash || [1, 0]);
           for(var i = 0; i < xLineNum; i++) {
             var item = this.gridOnAreaY[i];
             context.beginPath();
@@ -544,35 +630,101 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
             context.stroke();
           }
         }
-        context.strokeStyle = color;
-        context.lineWidth = lineWidth;
-        context.beginPath();
-        var start = clone[0];
-        var end = clone[clone.length - 1];
-        context.moveTo(start[0], start[1]);
-        if(clone.length > 2) {
-          context.quadraticCurveTo(ctrols[0][0], ctrols[0][1], clone[1][0], clone[1][1]);
-          for(var i = 2, len = clone.length; i < len - 1; i++) {
-            var left = ctrols[i - 2];
-            var right = ctrols[i - 1];
-            context.bezierCurveTo(left[2], left[3], right[0], right[1], clone[i][0], clone[i][1]);
-          }
-          var ctrl = ctrols[i - 2];
-          context.quadraticCurveTo(ctrl[2], ctrl[3], clone[i][0], clone[i][1]);
-        }
-        else {
-          context.lineTo(end[0], end[1]);
-        }
-        context.stroke();
+        context.closePath();
       }
     }
   }
-  Line.prototype.renderStraight = function(context, coords, index, y) {
+  Line.prototype.renderStraight = function(context, coords, index, y, x, color, lineWidth, breakLineWidth, breakColor, breakDash) {
     context.beginPath();
     var fill = this.option.areaColors[index];
     if(fill == 'transparent') {
       fill = null;
     }
+    if(fill && fill.charAt(0) != '#' && fill.charAt(0) != 'r') {
+      fill = '#' + color;
+    }
+    if(fill) {
+      context.fillStyle = fill;
+    }
+    if(coords.length) {
+      //从第一个非空点开始,防止前置有空数据
+      for(var i = 0, len = this.data.label.length; i < len; i++) {
+        if(coords[i]) {
+          break;
+        }
+      }
+      var begin = coords[i];
+      var last = coords[i];
+      var isPrevBreak = false;
+      for(++i; i < len - 1; i++) {
+        if(coords[i]) {
+          last = coords[i];
+          if(isPrevBreak) {
+            begin = coords[i];
+            context.strokeStyle = color;
+            context.lineWidth = lineWidth;
+            context.setLineDash([1, 0]);
+            context.moveTo(coords[i][0], coords[i][1]);
+          }
+          else {
+            context.lineTo(coords[i][0], coords[i][1]);
+          }
+          isPrevBreak = false;
+        }
+        else {
+          context.stroke();
+          if(fill && last != begin) {
+            context.lineTo(last[0], y);
+            context.lineTo(begin[0], y);
+            context.lineTo(begin[0], begin[1]);
+            context.fill();
+          }
+          context.closePath();
+          context.beginPath();
+          context.moveTo(last[0], last[1]);
+          //找到连续空白结尾
+          for(var next = i + 1; next < len - 1; next++) {
+            if(coords[next]) {
+              break;
+            }
+          }
+          i = next - 1;
+          context.strokeStyle = breakColor;
+          context.lineWidth = breakLineWidth;
+          context.setLineDash(breakDash);
+          context.lineTo(coords[next][0], coords[next][1]);
+          context.stroke();
+          context.closePath();
+          context.beginPath();
+          isPrevBreak = true;
+        }
+      }
+
+      if(coords[i]) {
+        if(!isPrevBreak) {
+          context.lineTo(coords[i][0], coords[i][1]);
+        }
+      }
+      else {
+        context.stroke();
+        if(fill && last != begin) {
+          context.lineTo(last[0], y);
+          context.lineTo(begin[0], y);
+          context.lineTo(begin[0], begin[1]);
+          context.fill();
+        }
+        context.closePath();
+        context.beginPath();
+        context.moveTo(last[0], last[1]);
+        context.strokeStyle = breakColor;
+        context.lineWidth = breakLineWidth;
+        context.setLineDash(breakDash);
+        context.lineTo(x, last[1]);
+      }
+      context.stroke();
+      context.closePath();
+    }
+    return;
     var start;
     var end;
     for(var i = 0, len = coords.length; i < len; i++) {

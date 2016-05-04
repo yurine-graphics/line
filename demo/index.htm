@@ -38,12 +38,12 @@
     search = search.replace(/^\?/, '');
     search = JSON.parse(decodeURIComponent(search) || '{}') || {};
     search.data = search.data || {
-      label:  ['abcdefg'],
+      label:  ['a', 'b', 'c', 'd', 'e', 'f', 'g'],
       value: [
-        [0.04]
+        [0, null, 4, 1, 3, 2]
       ]
     };
-    search.styles = search.styles || ['curve', 'straight'];
+    search.styles = search.styles || ['straight', 'straight'];
     search.discRadio = search.discRadio || 3;
     search.xNum = search.xNum || 4;
     search.yNum = search.yNum || 4;
@@ -76,19 +76,17 @@
       xNum: 10,
       yNum: 5,
       gridWidth: 2,
-      gridColor: '#000',
       yLineDash: [1000,0],
       xLineDash: [1000,0],
       colors: ['rgb(255,0,0)'],
       areaColors: search.areaColors,
+      gridColor: 'rgba(0,0,0,0.1)',
       xLine: true,
       yLine: true,
       xOutline: false,
       yOutline: true,
       fixed: 2,
       padding: 0,
-      percent: true,
-      gridOnArea: true
     });
   });
 </script>
