@@ -374,7 +374,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     coords.forEach(function(item, i) {
       var color = getColor(self.option, i);
       var style = self.option.styles[i];
-      self.renderLine(context, item, i, lineWidth, breakLineWidth, lineHeight, color, breakColor, breakDash, style, height - bottom, top, right, xLineNum, yLineNum);
+      self.renderLine(context, item, i, lineWidth, breakLineWidth, lineHeight, color, breakColor, breakDash, style, height - bottom, top, left, right, xLineNum, yLineNum);
     });
   }
   Line.prototype.renderOne = function(context, item, lineWidth, lineHeight, color, lineDash, right, bottom) {
@@ -406,14 +406,14 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
       context.closePath();
     }
   }
-  Line.prototype.renderLine = function(context, coords, index, lineWidth, breakLineWidth, lineHeight, color, breakColor, breakDash, style, y, y0, right, xLineNum, yLineNum) {
+  Line.prototype.renderLine = function(context, coords, index, lineWidth, breakLineWidth, lineHeight, color, breakColor, breakDash, style, y, y0, left, right, xLineNum, yLineNum) {
     var self = this;
     switch(style) {
       case 'curve':
-        self.renderCurve(context, coords, index, y, y0, right, color, lineWidth, breakLineWidth, breakColor, breakDash, xLineNum, yLineNum);
+        self.renderCurve(context, coords, index, y, y0, left, right, color, lineWidth, breakLineWidth, breakColor, breakDash, xLineNum, yLineNum);
         break;
       default:
-        self.renderStraight(context, coords, index, y, right, color, lineWidth, breakLineWidth, breakColor, breakDash);
+        self.renderStraight(context, coords, index, y, left, right, color, lineWidth, breakLineWidth, breakColor, breakDash);
         break;
     }
     if(self.option.discRadio) {
@@ -432,7 +432,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
       });
     }
   }
-  Line.prototype.renderCurve = function(context, coords, index, y, y0, x, color, lineWidth, breakLineWidth, breakColor, breakDash, xLineNum, yLineNum) {
+  Line.prototype.renderCurve = function(context, coords, index, y, y0, left, right, color, lineWidth, breakLineWidth, breakColor, breakDash, xLineNum, yLineNum) {
     if(coords.length) {
       var clone = [];
       coords.forEach(function(item) {
@@ -537,13 +537,13 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
             context.moveTo(coords[i][0], coords[i][1]);
           }
           else {
-            var left = ctrols[i - 2 - count];
-            var right = ctrols[i - 1 - count];
-            if(right) {
-              context.bezierCurveTo(left[2], left[3], right[0], right[1], coords[i][0], coords[i][1]);
+            var leftC = ctrols[i - 2 - count];
+            var rightC = ctrols[i - 1 - count];
+            if(rightC) {
+              context.bezierCurveTo(leftC[2], leftC[3], rightC[0], rightC[1], coords[i][0], coords[i][1]);
             }
             else {
-              context.quadraticCurveTo(left[2], left[3], coords[i][0], coords[i][1]);
+              context.quadraticCurveTo(leftC[2], leftC[3], coords[i][0], coords[i][1]);
             }
           }
           isPrevBreak = false;
@@ -597,13 +597,19 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
           context.fill();
         }
         context.closePath();
-        if(this.option.breakEnd) {
-          context.beginPath();
-          context.moveTo(last[0], last[1]);
-          context.strokeStyle = breakColor;
-          context.lineWidth = breakLineWidth;
-          context.setLineDash(breakDash);
-          context.lineTo(x, last[1]);
+        context.beginPath();
+        context.moveTo(last[0], last[1]);
+        context.strokeStyle = breakColor;
+        context.lineWidth = breakLineWidth;
+        context.setLineDash(breakDash);
+        if(!this.option.breakEnd || this.option.breakEnd <= 0) {
+          context.lineTo(right, last[1]);
+        }
+        else {
+          var x = left + (right - left) * this.option.breakEnd / (this.data.label.length - 1 || 1);
+          if(x > last[0]) {
+            context.lineTo(x, last[1]);
+          }
         }
       }
       context.stroke();
@@ -638,7 +644,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
       }
     }
   }
-  Line.prototype.renderStraight = function(context, coords, index, y, x, color, lineWidth, breakLineWidth, breakColor, breakDash) {
+  Line.prototype.renderStraight = function(context, coords, index, y, left, right, color, lineWidth, breakLineWidth, breakColor, breakDash) {
     context.beginPath();
     var fill = this.option.areaColors[index];
     if(fill == 'transparent') {
@@ -720,13 +726,19 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
           context.fill();
         }
         context.closePath();
-        if(this.option.breakEnd) {
-          context.beginPath();
-          context.moveTo(last[0], last[1]);
-          context.strokeStyle = breakColor;
-          context.lineWidth = breakLineWidth;
-          context.setLineDash(breakDash);
-          context.lineTo(x, last[1]);
+        context.beginPath();
+        context.moveTo(last[0], last[1]);
+        context.strokeStyle = breakColor;
+        context.lineWidth = breakLineWidth;
+        context.setLineDash(breakDash);
+        if(!this.option.breakEnd || this.option.breakEnd <= 0) {
+          context.lineTo(right, last[1]);
+        }
+        else {
+          var x = left + (right - left) * this.option.breakEnd / (this.data.label.length - 1 || 1);
+          if(x > last[0]) {
+            context.lineTo(x, last[1]);
+          }
         }
       }
       context.stroke();

@@ -55,8 +55,8 @@ npm install yurine-line
      - gridOnArea:Boolean 背景网格线显示在area上
      - breakLineWidth:int 断格绘线粗细，单位px，∈\[1, 可视半径]
      - breakColor:String 断格绘线颜色
-     - breakDash:Array\<int> 断格绘线虚线类型
-     - breakEnd:Boolean 末尾的空数据是否需要断格绘线，默认true
+     - breakDash:Array\<int> 断格绘线虚线类型，特别的对于末尾，null标识需要断格绘线，undefined标识空白
+     - breakEnd:int 断格绘线末尾终止索引，超过将不绘，默认0忽略
  * getCoords():Array\<Array> 获取绘制点的坐标，是个二维数组，包含所有线条
  * getCoord(index:int):Array\<Array\<x:Number, y:Number>> 获取第index线条的所有坐标，-1从末尾起
  * getPoint(index:int, j:int):Array\<x:Number, y:Number> 获取第index线条的第j点的纵坐标，-1从末尾起
