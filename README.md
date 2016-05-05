@@ -16,7 +16,6 @@ npm install yurine-line
    * selector:String 渲染的canvas对象或选择器
    * data:Object 渲染数据数组
      - label:Array\<String> 标签，横坐标数据长度以此为准，多余的会被忽略
-     - length:int 手动指定横坐标长度，具有更高优先级
      - value:Array\<Array\<int>> 值组 
    * option:Object 选项
      - font:String 文字字体css缩写
@@ -58,6 +57,7 @@ npm install yurine-line
      - breakColor:String 断格绘线颜色
      - breakDash:Array\<int> 断格绘线虚线类型，特别的对于末尾，null标识需要断格绘线，undefined标识空白
      - breakEnd:int 断格绘线末尾终止索引，超过将不绘，默认0忽略
+     - labelIndex:Array\<int> 指明显示哪些坐标的索引，默认为空按计算逻辑
  * getCoords():Array\<Array> 获取绘制点的坐标，是个二维数组，包含所有线条
  * getCoord(index:int):Array\<Array\<x:Number, y:Number>> 获取第index线条的所有坐标，-1从末尾起
  * getPoint(index:int, j:int):Array\<x:Number, y:Number> 获取第index线条的第j点的纵坐标，-1从末尾起

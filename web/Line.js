@@ -268,13 +268,13 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     }
 
     left += 10 + x;
-    if(this.option.xLine) {
+    if(this.option.yLine) {
       context.setLineDash && context.setLineDash(this.option.yLineDash || [width, 0]);
-      this.gridOnAreaX = [];
+      this.gridOnAreaY = [];
       for(var i = 0; i < yLineNum; i++) {
         var y = Math.round(height - stepY2 * i - bottom);
         if(this.option.gridOnArea) {
-          this.gridOnAreaX.push([left, y, width - padding[1], y]);
+          this.gridOnAreaY.push([left, y, width - padding[1], y]);
         }
         else {
           context.beginPath();
@@ -301,12 +301,12 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     var x = left + stepX * (this.data.label.length - 1);
     this.renderXItem(item, context, padding, height, lineHeight, x, i == 0, true);
     coords.push([x, y]);
-    if(this.option.yLine) {
-      this.gridOnAreaY = [];
+    if(this.option.xLine) {
+      this.gridOnAreaX = [];
       for(var i = 0; i < xLineNum - 1; i++) {
         var x = Math.round(left + i * stepX * Math.floor(increase2));
         if(this.option.gridOnArea) {
-          this.gridOnAreaY.push([x, padding[0], x, y - 10]);
+          this.gridOnAreaX.push([x, padding[0], x, y - 10]);
         }
         else {
           context.beginPath();
@@ -316,7 +316,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
         }
       }
       if(this.option.gridOnArea) {
-        this.gridOnAreaY.push([right, padding[0], right, y - 10]);
+        this.gridOnAreaX.push([right, padding[0], right, y - 10]);
       }
       else {
         context.beginPath();
@@ -380,7 +380,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     var self = this;
     context.strokeStyle = color;
     context.lineWidth = lineWidth;
-    context.setLineDash(lineDash);
+    context.setLineDash && context.setLineDash(lineDash);
     context.beginPath();
     context.moveTo(item[0], item[1]);
     context.lineTo(right, item[1]);
@@ -532,7 +532,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
             begin = coords[i];
             context.strokeStyle = color;
             context.lineWidth = lineWidth;
-            context.setLineDash([1, 0]);
+            context.setLineDash && context.setLineDash([1, 0]);
             context.moveTo(coords[i][0], coords[i][1]);
           }
           else {
@@ -572,7 +572,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
             i = next - 1;
             context.strokeStyle = breakColor;
             context.lineWidth = breakLineWidth;
-            context.setLineDash(breakDash);
+            context.setLineDash && context.setLineDash(breakDash);
             context.lineTo(coords[next][0], coords[next][1]);
             context.stroke();
             context.closePath();
@@ -609,7 +609,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
         context.moveTo(last[0], last[1]);
         context.strokeStyle = breakColor;
         context.lineWidth = breakLineWidth;
-        context.setLineDash(breakDash);
+        context.setLineDash && context.setLineDash(breakDash);
         if(!this.option.breakEnd || this.option.breakEnd <= 0) {
           context.lineTo(right, last[1]);
         }
@@ -627,7 +627,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
         if(this.option.xLine) {
           context.lineWidth = this.option.gridWidth;
           context.strokeStyle = this.option.gridColor;
-          context.setLineDash(this.option.xLineDash || [1, 0]);
+          context.setLineDash && context.setLineDash(this.option.xLineDash || [1, 0]);
           for(var i = 0; i < yLineNum; i++) {
             var item = this.gridOnAreaX[i];
             context.beginPath();
@@ -639,7 +639,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
         if(this.option.yLine) {
           context.lineWidth = this.option.gridWidth;
           context.strokeStyle = this.option.gridColor;
-          context.setLineDash(this.option.yLineDash || [1, 0]);
+          context.setLineDash && context.setLineDash(this.option.yLineDash || [1, 0]);
           for(var i = 0; i < xLineNum; i++) {
             var item = this.gridOnAreaY[i];
             context.beginPath();
@@ -681,7 +681,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
             begin = coords[i];
             context.strokeStyle = color;
             context.lineWidth = lineWidth;
-            context.setLineDash([1, 0]);
+            context.setLineDash && context.setLineDash([1, 0]);
             context.moveTo(coords[i][0], coords[i][1]);
           }
           else {
@@ -710,7 +710,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
             i = next - 1;
             context.strokeStyle = breakColor;
             context.lineWidth = breakLineWidth;
-            context.setLineDash(breakDash);
+            context.setLineDash && context.setLineDash(breakDash);
             context.lineTo(coords[next][0], coords[next][1]);
             context.stroke();
             context.closePath();
@@ -747,7 +747,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
         context.moveTo(last[0], last[1]);
         context.strokeStyle = breakColor;
         context.lineWidth = breakLineWidth;
-        context.setLineDash(breakDash);
+        context.setLineDash && context.setLineDash(breakDash);
         if(!this.option.breakEnd || this.option.breakEnd <= 0) {
           context.lineTo(right, last[1]);
         }
@@ -766,7 +766,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
       if(this.option.xLine) {
         context.lineWidth = this.option.gridWidth;
         context.strokeStyle = this.option.gridColor;
-        context.setLineDash(this.option.xLineDash || [1, 0]);
+        context.setLineDash && context.setLineDash(this.option.xLineDash || [1, 0]);
         for(var i = 0; i < yLineNum; i++) {
           var item = this.gridOnAreaX[i];
           context.beginPath();
@@ -778,7 +778,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
       if(this.option.yLine) {
         context.lineWidth = this.option.gridWidth;
         context.strokeStyle = this.option.gridColor;
-        context.setLineDash(this.option.yLineDash || [1, 0]);
+        context.setLineDash && context.setLineDash(this.option.yLineDash || [1, 0]);
         for(var i = 0; i < xLineNum; i++) {
           var item = this.gridOnAreaY[i];
           context.beginPath();
