@@ -56,6 +56,7 @@ npm install yurine-line
      - breakLineWidth:int 断格绘线粗细，单位px，∈\[1, 可视半径]
      - breakColor:String 断格绘线颜色
      - breakDash:Array\<int> 断格绘线虚线类型，特别的对于末尾，null标识需要断格绘线，undefined标识空白
+     - breakStart:int 断格绘线开始绘制索引，超过将不绘，默认0忽略
      - breakEnd:int 断格绘线末尾终止索引，超过将不绘，默认0忽略
      - labelIndex:Array\<int> 指明显示哪些坐标的索引，默认为空按计算逻辑
  * getCoords():Array\<Array> 获取绘制点的坐标，是个二维数组，包含所有线条

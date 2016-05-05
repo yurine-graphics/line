@@ -385,7 +385,6 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     }
     var breakDash = self.option.breakDash || [4, 4];
     if(coords.length == 1 && coords[0].length == 1) {
-      var color = getColor(self.option, 0);
       var item = coords[0];
       item[0][1] = height - bottom - stepV;
       self.renderOne(context, item[0], breakLineWidth, lineHeight, breakColor, breakDash, right, height - bottom);
@@ -523,8 +522,6 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
       }
 
       context.beginPath();
-      var start = clone[0];
-      var end = clone[clone.length - 1];
       var fill = this.option.areaColors[index];
       if(fill == 'transparent') {
         fill = null;
@@ -545,10 +542,20 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
           count++;
         }
       }
+      if(i > 0 && this.option.breakStart && this.option.breakStart < i) {
+        var x = left + (right - left) * this.option.breakStart / (this.data.label.length - 1 || 1);
+        context.strokeStyle = breakColor;
+        context.lineWidth = breakLineWidth;
+        context.setLineDash && context.setLineDash(breakDash);
+        context.moveTo(x, coords[i][1]);
+        context.lineTo(coords[i][0], coords[i][1]);
+        context.stroke();
+        context.closePath();
+      }
       var begin = clone[0];
       var last = clone[0];
       context.moveTo(last[0], last[1]);
-      var isPrevBreak = true;
+      var isPrevBreak = false;
       for(++i; i < len - 1; i++) {
         if(coords[i]) {
           last = coords[i];
@@ -557,13 +564,17 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
             context.strokeStyle = color;
             context.lineWidth = lineWidth;
             context.setLineDash && context.setLineDash([1, 0]);
+            context.beginPath();
             context.moveTo(coords[i][0], coords[i][1]);
           }
           else {
             var leftC = ctrols[i - 2 - count];
             var rightC = ctrols[i - 1 - count];
-            if(rightC) {
+            if(leftC && rightC) {
               context.bezierCurveTo(leftC[2], leftC[3], rightC[0], rightC[1], coords[i][0], coords[i][1]);
+            }
+            else if(rightC) {
+              context.quadraticCurveTo(rightC[0], rightC[1], coords[i][0], coords[i][1]);
             }
             else {
               context.quadraticCurveTo(leftC[2], leftC[3], coords[i][0], coords[i][1]);
@@ -578,6 +589,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
             context.lineTo(begin[0], y);
             context.lineTo(begin[0], begin[1]);
             context.fill();
+            begin = last;
           }
           context.closePath();
           context.beginPath();
@@ -715,9 +727,21 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
           break;
         }
       }
+      if(i > 0 && this.option.breakStart && this.option.breakStart < i) {
+        var x = left + (right - left) * this.option.breakStart / (this.data.label.length - 1 || 1);
+        context.strokeStyle = breakColor;
+        context.lineWidth = breakLineWidth;
+        context.setLineDash && context.setLineDash(breakDash);
+        context.moveTo(x, coords[i][1]);
+        context.lineTo(coords[i][0], coords[i][1]);
+        context.stroke();
+        context.closePath();
+        context.beginPath();
+      }
       var begin = coords[i];
       var last = coords[i];
-      var isPrevBreak = true;
+      var isPrevBreak = false;
+      context.moveTo(last[0], last[1]);
       for(++i; i < len - 1; i++) {
         if(coords[i]) {
           last = coords[i];
@@ -740,6 +764,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
             context.lineTo(begin[0], y);
             context.lineTo(begin[0], begin[1]);
             context.fill();
+            begin = last;
           }
           context.closePath();
           context.beginPath();
