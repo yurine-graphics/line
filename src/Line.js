@@ -542,7 +542,7 @@ class Line {
           count++;
         }
       }
-      if(i > 0 && this.option.breakStart && this.option.breakStart < i) {
+      if(i > 0 && this.option.breakStart !== undefined && this.option.breakStart < i) {
         var x = left + (right - left) * this.option.breakStart / (this.data.label.length - 1 || 1);
         context.strokeStyle = breakColor;
         context.lineWidth = breakLineWidth;
