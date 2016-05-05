@@ -219,7 +219,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     var increase = (this.data.label.length - 1) / (xNum - 1);
     var increase2 = (this.data.label.length - 1) / (xLineNum - 1);
 
-    this.renderX(context, padding, height, lineHeight, left, xNum, stepX, increase, xLineNum, increase2);
+    this.renderX(context, padding, height, lineHeight, left, width - padding[1] - padding[3], xNum, stepX, increase, xLineNum, increase2);
 
     return [left, bottom, stepX, stepY];
   }
@@ -287,7 +287,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
 
     return left;
   }
-  Line.prototype.renderX = function(context, padding, height, lineHeight, left, xNum, stepX, increase, xLineNum, increase2) {
+  Line.prototype.renderX = function(context, padding, height, lineHeight, left, right, xNum, stepX, increase, xLineNum, increase2) {
     var coords = this.xCoords = [];
     context.setLineDash && context.setLineDash(this.option.xLineDash || [1, 0]);
     var y = height - lineHeight - padding[2];
@@ -315,14 +315,13 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
           context.stroke();
         }
       }
-      x = Math.round(left + i * stepX * Math.floor(increase2));
       if(this.option.gridOnArea) {
-        this.gridOnAreaY.push([x, padding[0], x, y - 10]);
+        this.gridOnAreaY.push([right, padding[0], right, y - 10]);
       }
       else {
         context.beginPath();
-        context.moveTo(x, padding[0]);
-        context.lineTo(x, y - 10);
+        context.moveTo(right, padding[0]);
+        context.lineTo(right, y - 10);
         context.stroke();
       }
     }
@@ -583,9 +582,18 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
         }
       }
       if(coords[i]) {
+        last = coords[i];
         if(!isPrevBreak) {
           var ctrl = ctrols[i - 2 - count];
           context.quadraticCurveTo(ctrl[2], ctrl[3], coords[i][0], coords[i][1]);
+          context.stroke();
+          if(fill && last != begin) {
+            context.lineTo(last[0], y);
+            context.lineTo(begin[0], y);
+            context.lineTo(begin[0], begin[1]);
+            context.fill();
+          }
+          context.closePath();
         }
       }
       else {
@@ -611,9 +619,9 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
             context.lineTo(x, last[1]);
           }
         }
+        context.stroke();
+        context.closePath();
       }
-      context.stroke();
-      context.closePath();
 
       if(this.option.gridOnArea) {
         if(this.option.xLine) {
@@ -713,8 +721,17 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
       }
 
       if(coords[i]) {
+        last = coords[i];
         if(!isPrevBreak) {
           context.lineTo(coords[i][0], coords[i][1]);
+          context.stroke();
+          if(fill && last != begin) {
+            context.lineTo(last[0], y);
+            context.lineTo(begin[0], y);
+            context.lineTo(begin[0], begin[1]);
+            context.fill();
+          }
+          context.closePath();
         }
       }
       else {
@@ -740,38 +757,10 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
             context.lineTo(x, last[1]);
           }
         }
-      }
-      context.stroke();
-      context.closePath();
-    }
-    return;
-    var start;
-    var end;
-    for(var i = 0, len = coords.length; i < len; i++) {
-      var item = coords[i];
-      if(start) {
-        if(item !== null && item !== undefined) {
-          context.lineTo(item[0], item[1]);
-          end = item;
-        }
-        else {
-          if(fill) {
-            context.lineTo(end[0], y);
-            context.lineTo(start[0], y);
-            context.lineTo(start[0], start[1]);
-            context.fill();
-          }
-          context.stroke();
-          start = end = null;
-        }
-      }
-      else if(item !== null && item !== undefined) {
-        start = item;
-        context.lineTo(start[0], start[1]);
+        context.stroke();
+        context.closePath();
       }
     }
-    context.stroke();
-    context.closePath();
   }
   Line.prototype.getCoords = function() {
     return this.coords;
