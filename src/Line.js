@@ -354,7 +354,7 @@ class Line {
           return;
         }
         var x = left + i * stepX;
-        var y = height - bottom - (item2 - min) * stepY / stepV;
+        var y = height - bottom - (item2 - min) * stepY / (stepV || 1);
         arr.push([x, y]);
       });
       coords.push(arr);
@@ -525,7 +525,7 @@ class Line {
       var last = clone[0];
       context.moveTo(last[0], last[1]);
       var count = 0;
-      var isPrevBreak = false;
+      var isPrevBreak = true;
       for(++i; i < len - 1; i++) {
         if(coords[i]) {
           last = coords[i];
@@ -569,14 +569,16 @@ class Line {
               count++;
             }
           }
-          i = next - 1;
-          context.strokeStyle = breakColor;
-          context.lineWidth = breakLineWidth;
-          context.setLineDash(breakDash);
-          context.lineTo(coords[next][0], coords[next][1]);
-          context.stroke();
-          context.closePath();
-          context.beginPath();
+          if(coords[next]) {
+            i = next - 1;
+            context.strokeStyle = breakColor;
+            context.lineWidth = breakLineWidth;
+            context.setLineDash(breakDash);
+            context.lineTo(coords[next][0], coords[next][1]);
+            context.stroke();
+            context.closePath();
+            context.beginPath();
+          }
           isPrevBreak = true;
         }
       }
@@ -595,12 +597,14 @@ class Line {
           context.fill();
         }
         context.closePath();
-        context.beginPath();
-        context.moveTo(last[0], last[1]);
-        context.strokeStyle = breakColor;
-        context.lineWidth = breakLineWidth;
-        context.setLineDash(breakDash);
-        context.lineTo(x, last[1]);
+        if(this.option.breakEnd) {
+          context.beginPath();
+          context.moveTo(last[0], last[1]);
+          context.strokeStyle = breakColor;
+          context.lineWidth = breakLineWidth;
+          context.setLineDash(breakDash);
+          context.lineTo(x, last[1]);
+        }
       }
       context.stroke();
       context.closePath();
@@ -655,7 +659,7 @@ class Line {
       }
       var begin = coords[i];
       var last = coords[i];
-      var isPrevBreak = false;
+      var isPrevBreak = true;
       for(++i; i < len - 1; i++) {
         if(coords[i]) {
           last = coords[i];
@@ -688,14 +692,16 @@ class Line {
               break;
             }
           }
-          i = next - 1;
-          context.strokeStyle = breakColor;
-          context.lineWidth = breakLineWidth;
-          context.setLineDash(breakDash);
-          context.lineTo(coords[next][0], coords[next][1]);
-          context.stroke();
-          context.closePath();
-          context.beginPath();
+          if(coords[next]) {
+            i = next - 1;
+            context.strokeStyle = breakColor;
+            context.lineWidth = breakLineWidth;
+            context.setLineDash(breakDash);
+            context.lineTo(coords[next][0], coords[next][1]);
+            context.stroke();
+            context.closePath();
+            context.beginPath();
+          }
           isPrevBreak = true;
         }
       }
@@ -714,12 +720,14 @@ class Line {
           context.fill();
         }
         context.closePath();
-        context.beginPath();
-        context.moveTo(last[0], last[1]);
-        context.strokeStyle = breakColor;
-        context.lineWidth = breakLineWidth;
-        context.setLineDash(breakDash);
-        context.lineTo(x, last[1]);
+        if(this.option.breakEnd) {
+          context.beginPath();
+          context.moveTo(last[0], last[1]);
+          context.strokeStyle = breakColor;
+          context.lineWidth = breakLineWidth;
+          context.setLineDash(breakDash);
+          context.lineTo(x, last[1]);
+        }
       }
       context.stroke();
       context.closePath();

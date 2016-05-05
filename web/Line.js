@@ -354,7 +354,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
           return;
         }
         var x = left + i * stepX;
-        var y = height - bottom - (item2 - min) * stepY / stepV;
+        var y = height - bottom - (item2 - min) * stepY / (stepV || 1);
         arr.push([x, y]);
       });
       coords.push(arr);
@@ -525,7 +525,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
       var last = clone[0];
       context.moveTo(last[0], last[1]);
       var count = 0;
-      var isPrevBreak = false;
+      var isPrevBreak = true;
       for(++i; i < len - 1; i++) {
         if(coords[i]) {
           last = coords[i];
@@ -569,14 +569,16 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
               count++;
             }
           }
-          i = next - 1;
-          context.strokeStyle = breakColor;
-          context.lineWidth = breakLineWidth;
-          context.setLineDash(breakDash);
-          context.lineTo(coords[next][0], coords[next][1]);
-          context.stroke();
-          context.closePath();
-          context.beginPath();
+          if(coords[next]) {
+            i = next - 1;
+            context.strokeStyle = breakColor;
+            context.lineWidth = breakLineWidth;
+            context.setLineDash(breakDash);
+            context.lineTo(coords[next][0], coords[next][1]);
+            context.stroke();
+            context.closePath();
+            context.beginPath();
+          }
           isPrevBreak = true;
         }
       }
@@ -595,12 +597,14 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
           context.fill();
         }
         context.closePath();
-        context.beginPath();
-        context.moveTo(last[0], last[1]);
-        context.strokeStyle = breakColor;
-        context.lineWidth = breakLineWidth;
-        context.setLineDash(breakDash);
-        context.lineTo(x, last[1]);
+        if(this.option.breakEnd) {
+          context.beginPath();
+          context.moveTo(last[0], last[1]);
+          context.strokeStyle = breakColor;
+          context.lineWidth = breakLineWidth;
+          context.setLineDash(breakDash);
+          context.lineTo(x, last[1]);
+        }
       }
       context.stroke();
       context.closePath();
@@ -655,7 +659,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
       }
       var begin = coords[i];
       var last = coords[i];
-      var isPrevBreak = false;
+      var isPrevBreak = true;
       for(++i; i < len - 1; i++) {
         if(coords[i]) {
           last = coords[i];
@@ -688,14 +692,16 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
               break;
             }
           }
-          i = next - 1;
-          context.strokeStyle = breakColor;
-          context.lineWidth = breakLineWidth;
-          context.setLineDash(breakDash);
-          context.lineTo(coords[next][0], coords[next][1]);
-          context.stroke();
-          context.closePath();
-          context.beginPath();
+          if(coords[next]) {
+            i = next - 1;
+            context.strokeStyle = breakColor;
+            context.lineWidth = breakLineWidth;
+            context.setLineDash(breakDash);
+            context.lineTo(coords[next][0], coords[next][1]);
+            context.stroke();
+            context.closePath();
+            context.beginPath();
+          }
           isPrevBreak = true;
         }
       }
@@ -714,12 +720,14 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
           context.fill();
         }
         context.closePath();
-        context.beginPath();
-        context.moveTo(last[0], last[1]);
-        context.strokeStyle = breakColor;
-        context.lineWidth = breakLineWidth;
-        context.setLineDash(breakDash);
-        context.lineTo(x, last[1]);
+        if(this.option.breakEnd) {
+          context.beginPath();
+          context.moveTo(last[0], last[1]);
+          context.strokeStyle = breakColor;
+          context.lineWidth = breakLineWidth;
+          context.setLineDash(breakDash);
+          context.lineTo(x, last[1]);
+        }
       }
       context.stroke();
       context.closePath();
