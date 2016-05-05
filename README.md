@@ -16,6 +16,7 @@ npm install yurine-line
    * selector:String 渲染的canvas对象或选择器
    * data:Object 渲染数据数组
      - label:Array\<String> 标签，横坐标数据长度以此为准，多余的会被忽略
+     - length:int 手动指定横坐标长度，具有更高优先级
      - value:Array\<Array\<int>> 值组 
    * option:Object 选项
      - font:String 文字字体css缩写

@@ -412,7 +412,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
         self.renderCurve(context, coords, index, y, y0, left, right, color, lineWidth, breakLineWidth, breakColor, breakDash, xLineNum, yLineNum);
         break;
       default:
-        self.renderStraight(context, coords, index, y, left, right, color, lineWidth, breakLineWidth, breakColor, breakDash);
+        self.renderStraight(context, coords, index, y, left, right, color, lineWidth, breakLineWidth, breakColor, breakDash, xLineNum, yLineNum);
         break;
     }
     if(self.option.discRadio) {
@@ -652,7 +652,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
       }
     }
   }
-  Line.prototype.renderStraight = function(context, coords, index, y, left, right, color, lineWidth, breakLineWidth, breakColor, breakDash) {
+  Line.prototype.renderStraight = function(context, coords, index, y, left, right, color, lineWidth, breakLineWidth, breakColor, breakDash, xLineNum, yLineNum) {
     context.beginPath();
     var fill = this.option.areaColors[index];
     if(fill == 'transparent') {
@@ -760,6 +760,34 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
         context.stroke();
         context.closePath();
       }
+    }
+
+    if(this.option.gridOnArea) {
+      if(this.option.xLine) {
+        context.lineWidth = this.option.gridWidth;
+        context.strokeStyle = this.option.gridColor;
+        context.setLineDash(this.option.xLineDash || [1, 0]);
+        for(var i = 0; i < yLineNum; i++) {
+          var item = this.gridOnAreaX[i];
+          context.beginPath();
+          context.moveTo(item[0], item[1]);
+          context.lineTo(item[2], item[3]);
+          context.stroke();
+        }
+      }
+      if(this.option.yLine) {
+        context.lineWidth = this.option.gridWidth;
+        context.strokeStyle = this.option.gridColor;
+        context.setLineDash(this.option.yLineDash || [1, 0]);
+        for(var i = 0; i < xLineNum; i++) {
+          var item = this.gridOnAreaY[i];
+          context.beginPath();
+          context.moveTo(item[0], item[1]);
+          context.lineTo(item[2], item[3]);
+          context.stroke();
+        }
+      }
+      context.closePath();
     }
   }
   Line.prototype.getCoords = function() {
