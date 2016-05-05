@@ -88,10 +88,9 @@ class Line {
 
     var max = parseFloat(self.data.value[0][0]) || 0;
     var min = parseFloat(self.data.value[0][0]) || 0;
-    var maxLength = self.data.value[0].length;
+    var maxLength = self.data.label.length || 0;
     self.data.value.forEach(function(item) {
-      maxLength = Math.max(maxLength, item.length);
-      item.forEach(function(item2) {
+      item && item.forEach(function(item2) {
         var v = parseFloat(item2) || 0;
         max = Math.max(max, v);
         min = Math.min(min, v);
