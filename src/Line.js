@@ -555,6 +555,9 @@ class Line {
       }
       var begin = clone[0];
       var last = clone[0];
+      context.strokeStyle = color;
+      context.lineWidth = lineWidth;
+      context.setLineDash && context.setLineDash([1, 0]);
       context.moveTo(last[0], last[1]);
       var isPrevBreak = false;
       for(++i; i < len - 1; i++) {
@@ -742,6 +745,9 @@ class Line {
       var begin = coords[i];
       var last = coords[i];
       var isPrevBreak = false;
+      context.strokeStyle = color;
+      context.lineWidth = lineWidth;
+      context.setLineDash && context.setLineDash([1, 0]);
       context.moveTo(last[0], last[1]);
       for(++i; i < len - 1; i++) {
         if(coords[i]) {
