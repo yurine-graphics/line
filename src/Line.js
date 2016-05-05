@@ -535,16 +535,19 @@ class Line {
       if(fill) {
         context.fillStyle = fill;
       }
+      var count = 0;
       //从第一个非空点开始,防止前置有空数据
       for(var i = 0, len = this.data.label.length; i < len; i++) {
         if(coords[i]) {
           break;
         }
+        else {
+          count++;
+        }
       }
       var begin = clone[0];
       var last = clone[0];
       context.moveTo(last[0], last[1]);
-      var count = 0;
       var isPrevBreak = true;
       for(++i; i < len - 1; i++) {
         if(coords[i]) {

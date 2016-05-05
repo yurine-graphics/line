@@ -88,10 +88,9 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
 
     var max = parseFloat(self.data.value[0][0]) || 0;
     var min = parseFloat(self.data.value[0][0]) || 0;
-    var maxLength = self.data.value[0].length;
+    var maxLength = self.data.label.length || 0;
     self.data.value.forEach(function(item) {
-      maxLength = Math.max(maxLength, item.length);
-      item.forEach(function(item2) {
+      item && item.forEach(function(item2) {
         var v = parseFloat(item2) || 0;
         max = Math.max(max, v);
         min = Math.min(min, v);
@@ -536,16 +535,19 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
       if(fill) {
         context.fillStyle = fill;
       }
+      var count = 0;
       //从第一个非空点开始,防止前置有空数据
       for(var i = 0, len = this.data.label.length; i < len; i++) {
         if(coords[i]) {
           break;
         }
+        else {
+          count++;
+        }
       }
       var begin = clone[0];
       var last = clone[0];
       context.moveTo(last[0], last[1]);
-      var count = 0;
       var isPrevBreak = true;
       for(++i; i < len - 1; i++) {
         if(coords[i]) {
