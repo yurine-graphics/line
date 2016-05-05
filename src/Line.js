@@ -551,6 +551,7 @@ class Line {
         context.lineTo(coords[i][0], coords[i][1]);
         context.stroke();
         context.closePath();
+        context.beginPath();
       }
       var begin = clone[0];
       var last = clone[0];
@@ -727,7 +728,7 @@ class Line {
           break;
         }
       }
-      if(i > 0 && this.option.breakStart && this.option.breakStart < i) {
+      if(i > 0 && this.option.breakStart !== undefined && this.option.breakStart < i) {
         var x = left + (right - left) * this.option.breakStart / (this.data.label.length - 1 || 1);
         context.strokeStyle = breakColor;
         context.lineWidth = breakLineWidth;

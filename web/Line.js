@@ -551,6 +551,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
         context.lineTo(coords[i][0], coords[i][1]);
         context.stroke();
         context.closePath();
+        context.beginPath();
       }
       var begin = clone[0];
       var last = clone[0];
@@ -727,7 +728,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
           break;
         }
       }
-      if(i > 0 && this.option.breakStart && this.option.breakStart < i) {
+      if(i > 0 && this.option.breakStart !== undefined && this.option.breakStart < i) {
         var x = left + (right - left) * this.option.breakStart / (this.data.label.length - 1 || 1);
         context.strokeStyle = breakColor;
         context.lineWidth = breakLineWidth;
