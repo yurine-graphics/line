@@ -340,8 +340,9 @@ class Line {
         }
         else {
           context.beginPath();
-          context.moveTo(right, padding[0]);
-          context.lineTo(right, y - 10);
+          var x = self.data.label.length > 1 ? right : left;
+          context.moveTo(x, padding[0]);
+          context.lineTo(x, y - 10);
           context.stroke();
         }
       }
@@ -398,22 +399,6 @@ class Line {
   }
   renderOne(context, item, lineWidth, lineHeight, color, lineDash, right, bottom) {
     var self = this;
-    context.strokeStyle = color;
-    context.lineWidth = lineWidth;
-    context.setLineDash && context.setLineDash(lineDash);
-    context.beginPath();
-    context.moveTo(item[0], item[1]);
-    context.lineTo(right, item[1]);
-    context.stroke();
-    var fill = this.option.areaColors[0];
-    if(fill && fill != 'transparent') {
-      context.fillStyle = fill;
-      context.lineTo(right, bottom);
-      context.lineTo(item[0], bottom);
-      context.lineTo(item[0], item[1]);
-      context.fill();
-    }
-    context.closePath();
     if(self.option.discRadio) {
       var discRadio = parseInt(self.option.discRadio) || 1;
       discRadio = Math.max(discRadio, 1);
@@ -625,7 +610,12 @@ class Line {
         last = coords[i];
         if(!isPrevBreak) {
           var ctrl = ctrols[i - 2 - count];
-          context.quadraticCurveTo(ctrl[2], ctrl[3], coords[i][0], coords[i][1]);
+          if(ctrl) {
+            context.quadraticCurveTo(ctrl[2], ctrl[3], coords[i][0], coords[i][1]);
+          }
+          else {
+            context.lineTo(coords[i][0], coords[i][1]);
+          }
           context.stroke();
           if(fill && last != begin) {
             context.lineTo(last[0], y);

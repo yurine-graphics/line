@@ -37,12 +37,10 @@
     var search = location.search || '';
     search = search.replace(/^\?/, '');
     search = JSON.parse(decodeURIComponent(search) || '{}') || {};
-    var label = [];
-    for(var i = 0; i < 7; i++) label[i] = i;
     search.data = search.data || {
-      label: label,
+      label: ['ff', 'f'],
       value: [
-        [null, null, 4, 1, 3, null, null]
+        [1,2]
       ]
     };
     search.styles = search.styles || ['curve', 'straight'];
