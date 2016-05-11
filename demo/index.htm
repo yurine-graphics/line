@@ -38,9 +38,9 @@
     search = search.replace(/^\?/, '');
     search = JSON.parse(decodeURIComponent(search) || '{}') || {};
     search.data = search.data || {
-      label: ['ff', 'f'],
+      label: ['ff'],
       value: [
-        [1,2]
+        [50,2]
       ]
     };
     search.styles = search.styles || ['curve', 'straight'];
@@ -75,6 +75,8 @@
       curvature: search.curvature,
       xNum: 5,
       yNum: 5,
+      max: 100,
+      min: 0,
       gridWidth: 2,
       yLineDash: [1000,0],
       xLineDash: [1000,0],

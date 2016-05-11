@@ -79,10 +79,10 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     gridWidth = Math.max(gridWidth, 1);
     gridWidth = Math.min(gridWidth, minSize >> 2);
 
-    var length = parseInt(self.data.label.length) || 0;
-    for(var i = 0, len = self.data.length; i < len; i++) {
-      if(self.data[i].length > length) {
-        self.data[i] = self.data[i].slice(0, i);
+    var length = self.data.label.length || 0;
+    for(var i = 0, len = self.data.value.length; i < len; i++) {
+      if(self.data.value[i].length > length) {
+        self.data.value[i] = self.data.value[i].slice(0, length);
       }
     }
 
@@ -154,9 +154,6 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     if(yNum < 1) {
       yNum = 1;
     }
-    else if(yNum > maxLength) {
-      yNum = maxLength;
-    }
     var xLineNum = parseInt(self.option.xLineNum) || xNum;
     if(xLineNum < 1) {
       xLineNum = 1;
@@ -167,9 +164,6 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     var yLineNum = parseInt(self.option.yLineNum) || yNum;
     if(yLineNum < 1) {
       yLineNum = 1;
-    }
-    else if(yLineNum > maxLength) {
-      yLineNum = maxLength;
     }
 
     var stepV = Math.abs(max - min) / Math.max(1, (yNum - 1));
@@ -385,19 +379,20 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
       breakColor = '#' + color;
     }
     var breakDash = self.option.breakDash || [4, 4];
-    if(coords.length == 1 && coords[0].length == 1) {
-      var item = coords[0];
-      item[0][1] = height - bottom - stepV;
-      self.renderOne(context, item[0], breakLineWidth, lineHeight, breakColor, breakDash, right, height - bottom);
-      return;
-    }
     coords.forEach(function(item, i) {
       var color = getColor(self.option, i);
+      if(!item.length) {
+        return;
+      }
+      if(item.length == 1) {
+        self.renderOne(context, item[0], lineHeight, color);
+        return;
+      }
       var style = self.option.styles[i];
       self.renderLine(context, item, i, lineWidth, breakLineWidth, lineHeight, color, breakColor, breakDash, style, height - bottom, top, left, right, xLineNum, yLineNum);
     });
   }
-  Line.prototype.renderOne = function(context, item, lineWidth, lineHeight, color, lineDash, right, bottom) {
+  Line.prototype.renderOne = function(context, item, lineHeight, color) {
     var self = this;
     if(self.option.discRadio) {
       var discRadio = parseInt(self.option.discRadio) || 1;
