@@ -662,7 +662,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
             });
           }
           else {
-            for(var i = 0; i < yLineNum; i++) {
+            for(var i = 0; i < xLineNum; i++) {
               var item = this.gridOnAreaX[i];
               context.beginPath();
               context.moveTo(item[0], item[1]);
@@ -684,7 +684,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
             });
           }
           else {
-            for(var i = 0; i < xLineNum; i++) {
+            for(var i = 0; i < yLineNum; i++) {
               var item = this.gridOnAreaY[i];
               context.beginPath();
               context.moveTo(item[0], item[1]);

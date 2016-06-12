@@ -662,7 +662,7 @@ class Line {
             });
           }
           else {
-            for(var i = 0; i < yLineNum; i++) {
+            for(var i = 0; i < xLineNum; i++) {
               var item = this.gridOnAreaX[i];
               context.beginPath();
               context.moveTo(item[0], item[1]);
@@ -684,7 +684,7 @@ class Line {
             });
           }
           else {
-            for(var i = 0; i < xLineNum; i++) {
+            for(var i = 0; i < yLineNum; i++) {
               var item = this.gridOnAreaY[i];
               context.beginPath();
               context.moveTo(item[0], item[1]);
