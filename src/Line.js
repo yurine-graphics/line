@@ -115,7 +115,6 @@ class Line {
 
     var max = parseFloat(self.data.value[0][0]) || 0;
     var min = parseFloat(self.data.value[0][0]) || 0;
-    var maxLength = self.data.label.length || 0;
     self.data.value.forEach(function(item) {
       item && item.forEach(function(item2) {
         var v = parseFloat(item2) || 0;
@@ -226,7 +225,7 @@ class Line {
       left += offsetX1;
     }
     var stepX;
-    stepX = width - padding[1] - padding[3] - left - (this.option.xOutline ? offsetX2 : 0);
+    stepX = width - padding[1] - left - (this.option.xOutline ? offsetX2 : 0);
     if(this.data.label.length > 1) {
       stepX /= this.data.label.length - 1;
     }
