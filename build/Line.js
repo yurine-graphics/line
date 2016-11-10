@@ -5,10 +5,7 @@ var colors = ['4A90E2', 'C374DE', 'F36342', 'F3A642', '93C93F', '50E3C2'];
 function getColor(option, i) {
   var idx = i % colors.length;
   var color = option.colors[idx] || colors[idx];
-  if(color.charAt(0) != '#' && color.charAt(0) != 'r') {
-    color = '#' + color;
-  }
-  return color;
+  return preColor(color);
 }
 
 function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
@@ -18,6 +15,36 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     x1 + (x2 - x0) * a, y1 + (y2 - y0) * a,
     x2 - (x3 - x1) * b, y2 - (y3 - y1) * b
   ];
+}
+
+function getTop(coords) {
+  var top = coords[0][1];
+  coords.forEach(function(item) {
+    top = Math.min(top, item[1]);
+  });
+  return top;
+}
+
+function preColor(color) {
+  if(color.charAt(0) != '#' && color.charAt(0) != 'r') {
+    return '#' + color;
+  }
+  return color;
+}
+
+function getGdr(context, top, y, fill) {
+  var gdr = context.createLinearGradient(0, top, 0, y);
+  var length = fill.length;
+  fill.forEach(function(item, i) {
+    if(/\s[\d.]+$/.test(item)) {
+      var j = item.lastIndexOf(' ');
+      gdr.addColorStop(parseFloat(item.slice(j + 1)), preColor(item.slice(0, j)));
+    }
+    else {
+      gdr.addColorStop(i / fill, preColor(item));
+    }
+  });
+  return gdr;
 }
 
 
@@ -40,8 +67,8 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
   Line.prototype.render = function() {
     var stepY;var stepX;var bottom;var left;var lineHeight;var fontSize;var fontWeight;var fontFamily;var fontVariant;var fontStyle;var self = this;
     var context = self.dom.getContext('2d');
-    var width = self.option.width || 300;
-    var height = self.option.height || 150;
+    var width = self.option.width || self.dom.getAttribute('width') || parseInt(window.getComputedStyle(self.dom, null).getPropertyValue('width')) || 300;
+    var height = self.option.height || self.dom.getAttribute('height') || parseInt(window.getComputedStyle(self.dom, null).getPropertyValue('height')) || 150;
     var padding = self.option.hasOwnProperty('padding') ? self.option.padding : [10, 10, 10, 10];
     if(Array.isArray(padding)) {
       switch(padding.length) {
@@ -175,14 +202,8 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     self.renderFg(context, height, lineHeight, lineWidth, breakLineWidth, left, bottom, padding[0], width - padding[3] - padding[1], stepX, stepY, stepV, min, xLineNum, yLineNum);
   }
   Line.prototype.renderBg = function(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV, xLineNum, yLineNum) {
-    var color = this.option.color || '#000';
-    if(color.charAt(0) != '#' && color.charAt(0) != 'r') {
-      color = '#' + color;
-    }
-    var gridColor = this.option.gridColor || 'rgba(0, 0, 0, 0.2)';
-    if(gridColor.charAt(0) != '#' && gridColor.charAt(0) != 'r') {
-      gridColor = '#' + gridColor;
-    }
+    var color = preColor(this.option.color || '#000');
+    var gridColor = preColor(this.option.gridColor || 'rgba(0, 0, 0, 0.2)');
     context.fillStyle = this.option.color = color;
     context.lineWidth = this.option.gridWidth = gridWidth;
     context.strokeStyle = this.option.gridColor = gridColor;
@@ -374,10 +395,7 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
       });
       coords.push(arr);
     });
-    var breakColor = self.option.breakColor || '#000';
-    if(breakColor.charAt(0) != '#' && breakColor.charAt(0) != 'r') {
-      breakColor = '#' + color;
-    }
+    var breakColor = preColor(self.option.breakColor || '#000');
     var breakDash = self.option.breakDash || [4, 4];
     coords.forEach(function(item, i) {
       var color = getColor(self.option, i);
@@ -506,11 +524,11 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
       if(fill == 'transparent') {
         fill = null;
       }
-      if(fill && fill.charAt(0) != '#' && fill.charAt(0) != 'r') {
-        fill = '#' + color;
+      if(Array.isArray(fill)) {
+        context.fillStyle = getGdr(context, getTop(coords), y, fill);
       }
-      if(fill) {
-        context.fillStyle = fill;
+      else if(fill) {
+        context.fillStyle = preColor(fill);
       }
       var count = 0;
       //从第一个非空点开始,防止前置有空数据
@@ -703,11 +721,11 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
     if(fill == 'transparent') {
       fill = null;
     }
-    if(fill && fill.charAt(0) != '#' && fill.charAt(0) != 'r') {
-      fill = '#' + color;
+    if(Array.isArray(fill)) {
+      context.fillStyle = getGdr(context, getTop(coords), y, fill);
     }
-    if(fill) {
-      context.fillStyle = fill;
+    else if(fill) {
+      context.fillStyle = preColor(fill);
     }
     if(coords.length) {
       //从第一个非空点开始,防止前置有空数据

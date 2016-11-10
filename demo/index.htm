@@ -26,7 +26,7 @@
   </style>
 </head>
 <body>
-<canvas id="canvas" width="600" height="300" style="width:300px;height:150px;"></canvas>
+<canvas id="canvas" width="580" height="290" style="width:290px;height:145px;"></canvas>
 <form>
   <textarea></textarea>
   <input type="submit" id="sub"/>
@@ -37,16 +37,230 @@
     var search = location.search || '';
     search = search.replace(/^\?/, '');
     search = JSON.parse(decodeURIComponent(search) || '{}') || {};
+    var data =[
+      {
+        "profitValue": 0,
+        "dataTime": 1457280000000
+      },
+      {
+        "profitValue": 0,
+        "dataTime": 1457366400000
+      },
+      {
+        "profitValue": 0.03941496,
+        "dataTime": 1457452800000
+      },
+      {
+        "profitValue": 0.22261123,
+        "dataTime": 1457539200000
+      },
+      {
+        "profitValue": 0.23364464,
+        "dataTime": 1457625600000
+      },
+      {
+        "profitValue": 0.23401474,
+        "dataTime": 1457884800000
+      },
+      {
+        "profitValue": 0.20394464,
+        "dataTime": 1457971200000
+      },
+      {
+        "profitValue": 0.3427297,
+        "dataTime": 1458057600000
+      },
+      {
+        "profitValue": 0.19355149,
+        "dataTime": 1458144000000
+      },
+      {
+        "profitValue": 0.29646801,
+        "dataTime": 1458230400000
+      },
+      {
+        "profitValue": 0.29646801,
+        "dataTime": 1458489600000
+      },
+      {
+        "profitValue": 0.29646801,
+        "dataTime": 1458576000000
+      },
+      {
+        "profitValue": 0.29646801,
+        "dataTime": 1458662400000
+      },
+      {
+        "profitValue": 0.29646801,
+        "dataTime": 1458748800000
+      },
+      {
+        "profitValue": 0.29646801,
+        "dataTime": 1458835200000
+      },
+      {
+        "profitValue": 0.60065433,
+        "dataTime": 1459094400000
+      },
+      {
+        "profitValue": 0.29646801,
+        "dataTime": 1459180800000
+      },
+      {
+        "profitValue": 0.29646801,
+        "dataTime": 1459267200000
+      },
+      {
+        "profitValue": 0.29646801,
+        "dataTime": 1459353600000
+      },
+      {
+        "profitValue": 0.56364498,
+        "dataTime": 1459440000000
+      },
+      {
+        "profitValue": 0.23981318,
+        "dataTime": 1459785600000
+      },
+      {
+        "profitValue": 0.23981318,
+        "dataTime": 1459872000000
+      },
+      {
+        "profitValue": 0.64691601,
+        "dataTime": 1459958400000
+      },
+      {
+        "profitValue": 0.64691601,
+        "dataTime": 1460044800000
+      },
+      {
+        "profitValue": 0.66542069,
+        "dataTime": 1460304000000
+      },
+      {
+        "profitValue": 0.66542069,
+        "dataTime": 1460390400000
+      },
+      {
+        "profitValue": 0.19355149,
+        "dataTime": 1460476800000
+      },
+      {
+        "profitValue": 0.60990666,
+        "dataTime": 1460563200000
+      },
+      {
+        "profitValue": 0.60990666,
+        "dataTime": 1460649600000
+      },
+      {
+        "profitValue": 0.62841134,
+        "dataTime": 1460908800000
+      },
+      {
+        "profitValue": 0.62841134,
+        "dataTime": 1460995200000
+      },
+      {
+        "profitValue": 0.29646801,
+        "dataTime": 1461081600000
+      },
+      {
+        "profitValue": 3.7,
+        "dataTime": 1462204800000
+      },
+      {
+        "profitValue": 8.6,
+        "dataTime": 1462291200000
+      },
+      {
+        "profitValue": 8.6,
+        "dataTime": 1462377600000
+      },
+      {
+        "profitValue": -0.5,
+        "dataTime": 1462464000000
+      },
+      {
+        "profitValue": -0.3,
+        "dataTime": 1462723200000
+      },
+      {
+        "profitValue": -0.3,
+        "dataTime": 1462809600000
+      },
+      {
+        "profitValue": 4.6,
+        "dataTime": 1462896000000
+      },
+      {
+        "profitValue": 4.6,
+        "dataTime": 1462982400000
+      },
+      {
+        "profitValue": -1,
+        "dataTime": 1463068800000
+      },
+      {
+        "profitValue": -0.7,
+        "dataTime": 1463328000000
+      },
+      {
+        "profitValue": -0.7,
+        "dataTime": 1463414400000
+      },
+      {
+        "profitValue": 4.2,
+        "dataTime": 1463500800000
+      },
+      {
+        "profitValue": 8.6,
+        "dataTime": 1463587200000
+      },
+      {
+        "profitValue": 3.5,
+        "dataTime": 1463673600000
+      },
+      {
+        "profitValue": 8.2,
+        "dataTime": 1463932800000
+      },
+      {
+        "profitValue": 3.1,
+        "dataTime": 1464019200000
+      },
+      {
+        "profitValue": 3.1,
+        "dataTime": 1464105600000
+      },
+      {
+        "profitValue": 8.4,
+        "dataTime": 1464192000000
+      },
+      {
+        "profitValue": 3.3,
+        "dataTime": 1464278400000
+      },
+      {
+        "profitValue": 6.1,
+        "dataTime": 1464537600000
+      },
+      {
+        "profitValue": 6.1,
+        "dataTime": 1464624000000
+      }
+    ];
     search.data = search.data || {
-      label: ['ff'],
+      label: data.map(function(item){return item.dataTime}),
       value: [
-        [50,2]
+        data.map(function(item) {return item.profitValue})
       ]
     };
     search.styles = search.styles || ['curve', 'straight'];
     search.discRadio = search.discRadio || 3;
     search.xNum = search.xNum || 4;
-    search.yNum = search.yNum || 4;
+    search.yNum = search.yNum || 5;
     search.lineWidth = search.lineWidth || 1;
     search.gridWidth = search.gridWidth || 1;
     search.yLineDash = search.yLineDash || [1];
@@ -66,31 +280,30 @@
     });
     var colors = ['FD8964', '72D572', 'FFC107', '8C9EFF', '9056EB'];
     var l = new Line('#canvas', search.data, {
-      width: 600,
-      height: 300,
-      fontSize: 24,
+//      width: 580,
+//      height: 290,
+      fontSize: 20,
       lineWidth: search.lineWidth,
-      discRadio: search.discRadio,
       styles: search.styles,
       curvature: search.curvature,
-      xNum: 5,
+      xNum: 3,
       yNum: 5,
-      max: 100,
-      min: 0,
-      gridWidth: 2,
+      xLineNum: 5,
+      max: 8.62,
+      min: -1,
       yLineDash: [1000,0],
       xLineDash: [1000,0],
-      colors: ['rgb(255,0,0)'],
-      areaColors: search.areaColors,
-      gridColor: 'rgba(0,0,0,0.1)',
+      color: '#979797',
+      colors: ['#F36342'],
+      areaColors: [['rgba(253,97,56,0.1) 0', 'rgba(253,97,56,0) 1']],
+      gridWidth: 1,
+      gridColor: 'rgba(249,249,249,1)',
       xLine: true,
       yLine: true,
-      xOutline: false,
-      yOutline: true,
       fixed: 2,
-      padding: 0,
       breakEnd: 6,
       breakStart: 0,
+      percent: true
 //      labelIndex: [0, 5]
     });
   });
