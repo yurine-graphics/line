@@ -12,7 +12,7 @@ npm install yurine-line
 [![preview](https://raw.githubusercontent.com/yurine-graphics/line/master/preview.png)](https://github.com/yurine-graphics/line)
 
 # API
- * Line(selector:DOM/String, data:\<\<String>, \<int>>, option:Object):Class
+ * Line(selector:DOM/String, data:\<Array\<String>, Array\<int>>, option:Object):Class
    * selector:String 渲染的canvas对象或选择器
    * data:Object 渲染数据数组
      - label:Array\<String> 标签，横坐标数据长度以此为准，多余的会被忽略

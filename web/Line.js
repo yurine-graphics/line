@@ -41,7 +41,7 @@ function getGdr(context, top, y, fill) {
       gdr.addColorStop(parseFloat(item.slice(j + 1)), preColor(item.slice(0, j)));
     }
     else {
-      gdr.addColorStop(i / fill, preColor(item));
+      gdr.addColorStop(i / (length - 1), preColor(item));
     }
   });
   return gdr;
