@@ -69,6 +69,7 @@ class Line {
     var context = self.dom.getContext('2d');
     var width = self.option.width || self.dom.getAttribute('width') || parseInt(window.getComputedStyle(self.dom, null).getPropertyValue('width')) || 300;
     var height = self.option.height || self.dom.getAttribute('height') || parseInt(window.getComputedStyle(self.dom, null).getPropertyValue('height')) || 150;
+    context.clearRect(0, 0, width, height);
     var padding = self.option.hasOwnProperty('padding') ? self.option.padding : [10, 10, 10, 10];
     if(Array.isArray(padding)) {
       switch(padding.length) {
