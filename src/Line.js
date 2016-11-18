@@ -94,19 +94,25 @@ class Line {
     }
     var paddingX = padding[1] + padding[3];
     var paddingY = padding[0] + padding[2];
-    var minSize = Math.min(width - paddingX, height - paddingY);
 
-    var lineWidth = parseInt(self.option.lineWidth) || 1;
-    lineWidth = Math.max(lineWidth, 1);
-    lineWidth = Math.min(lineWidth, minSize >> 2);
+    var lineWidth;
+    if(Array.isArray(self.option.lineWidth)) {
+      lineWidth = self.option.lineWidth;
+    }
+    else {
+      lineWidth = self.option.lineWidth;
+    }
 
-    var breakLineWidth = parseInt(self.option.breakLineWidth) || 1;
-    breakLineWidth = Math.max(breakLineWidth, 1);
-    breakLineWidth = Math.min(breakLineWidth, minSize >> 2);
+    var breakLineWidth;
+    if(Array.isArray(self.option.breakLineWidth)) {
+      breakLineWidth = self.option.breakLineWidth;
+    }
+    else {
+      breakLineWidth = self.option.breakLineWidth;
+    }
 
     var gridWidth = parseInt(self.option.gridWidth) || 1;
     gridWidth = Math.max(gridWidth, 1);
-    gridWidth = Math.min(gridWidth, minSize >> 2);
     
     var xlp = self.option.xlp || 0;
     var ylp = self.option.ylp || 0;
@@ -429,7 +435,9 @@ class Line {
         return;
       }
       var style = self.option.styles[i];
-      self.renderLine(context, item, i, lineWidth, breakLineWidth, lineHeight, color, breakColor, breakDash, style, height - bottom, top, left, right, xLineNum, yLineNum);
+      var lw = Array.isArray(lineWidth) ? lineWidth[i] : lineWidth;
+      var bw = Array.isArray(breakLineWidth) ? breakLineWidth[i] : breakLineWidth;
+      self.renderLine(context, item, i, lw, bw, lineHeight, color, breakColor, breakDash, style, height - bottom, top, left, right, xLineNum, yLineNum);
     });
   }
   renderOne(context, item, lineHeight, color) {

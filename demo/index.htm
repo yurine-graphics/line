@@ -254,7 +254,8 @@
     search.data = search.data || {
       label: data.map(function(item){return item.dataTime}),
       value: [
-        data.map(function(item) {return item.profitValue})
+        data.map(function(item) {return item.profitValue}),
+        data.map(function(item) {return Math.random() * 10})
       ]
     };
     search.styles = search.styles || ['curve', 'straight'];
@@ -283,7 +284,7 @@
 //      width: 580,
 //      height: 290,
       fontSize: 20,
-      lineWidth: search.lineWidth,
+      lineWidth: [search.lineWidth, 2],
       styles: search.styles,
       curvature: search.curvature,
       xNum: 3,
