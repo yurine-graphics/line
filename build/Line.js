@@ -61,6 +61,7 @@ function getGdr(context, top, y, fill) {
     this.option.colors = this.option.colors || [];
     this.option.areaColors = this.option.areaColors || [];
     this.option.styles = this.option.styles || [];
+    this.originCoords = [];
     this.render();
   }
 
@@ -285,6 +286,7 @@ function getGdr(context, top, y, fill) {
     }
 
     left += xlp + x;
+    this.originCoords.push(left);
     if(this.option.xLine) {
       context.setLineDash && context.setLineDash(this.option.xLineDash || [width, 0]);
       this.gridOnAreaY = [];
@@ -309,6 +311,7 @@ function getGdr(context, top, y, fill) {
     var coords = self.xCoords = [];
     context.setLineDash && context.setLineDash(self.option.yLineDash || [1, 0]);
     var y = height - lineHeight - padding[2];
+    self.originCoords.push(y - ylp);
     if(self.option.labelIndex) {
       self.option.labelIndex.forEach(function(item) {
         var x = left + item * stepX;
@@ -909,6 +912,9 @@ function getGdr(context, top, y, fill) {
   }
   Line.prototype.getYLabelCoords = function() {
     return this.yCoords;
+  }
+  Line.prototype.getOriginCoords = function() {
+    return this.originCoords;
   }
 
 

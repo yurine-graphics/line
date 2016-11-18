@@ -66,6 +66,7 @@ npm install yurine-line
  * getPoint(index:int, j:int):Array\<x:Number, y:Number> 获取第index线条的第j点的纵坐标，-1从末尾起
  * getXLabelCoords():Array\<Array\<x:Number, y:Number>> 获取x坐标标签，是个二维数组，包含所有线条
  * getYLabelCoords():Array\<Array\<x:Number, y:Number>> 获取y坐标标签，是个二维数组，包含所有线条
+ * getOriginCoords():Array\<x:Number, y:Number> 获取原点坐标
 
 # License
 [MIT License]
