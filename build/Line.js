@@ -106,6 +106,9 @@ function getGdr(context, top, y, fill) {
     var gridWidth = parseInt(self.option.gridWidth) || 1;
     gridWidth = Math.max(gridWidth, 1);
     gridWidth = Math.min(gridWidth, minSize >> 2);
+    
+    var xlp = self.option.xlp || 0;
+    var ylp = self.option.ylp || 0;
 
     var length = self.data.label.length || 0;
     for(var i = 0, len = self.data.value.length; i < len; i++) {
@@ -195,13 +198,13 @@ function getGdr(context, top, y, fill) {
 
     var stepV = Math.abs(max - min) / Math.max(1, (yNum - 1));
 
-    (function(){var _2= self.renderBg(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV, xLineNum, yLineNum);left=_2[0];bottom=_2[1];stepX=_2[2];stepY=_2[3]}).call(this);
+    (function(){var _2= self.renderBg(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV, xLineNum, yLineNum, xlp, ylp);left=_2[0];bottom=_2[1];stepX=_2[2];stepY=_2[3]}).call(this);
     if(yNum == 1) {
       stepV = stepY >> 1;
     }
     self.renderFg(context, height, lineHeight, lineWidth, breakLineWidth, left, bottom, padding[0], width - padding[3] - padding[1], stepX, stepY, stepV, min, xLineNum, yLineNum);
   }
-  Line.prototype.renderBg = function(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV, xLineNum, yLineNum) {
+  Line.prototype.renderBg = function(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV, xLineNum, yLineNum, xlp, ylp) {
     var color = preColor(this.option.color || '#000');
     var gridColor = preColor(this.option.gridColor || 'rgba(0, 0, 0, 0.2)');
     context.fillStyle = this.option.color = color;
@@ -209,7 +212,7 @@ function getGdr(context, top, y, fill) {
     context.strokeStyle = this.option.gridColor = gridColor;
 
     var stepY; var stepY2;
-    stepY = stepY2 = height - padding[0] - padding[2] - lineHeight * (this.option.yOutline ? 2 : 1) - 10;
+    stepY = stepY2 = height - padding[0] - padding[2] - lineHeight * (this.option.yOutline ? 2 : 1) - ylp;
     if(yNum > 1) {
       stepY /= yNum - 1;
     }
@@ -217,8 +220,8 @@ function getGdr(context, top, y, fill) {
       stepY2 /= yLineNum - 1;
     }
 
-    var bottom = padding[2] + lineHeight * (this.option.yOutline ? 1.5 : 1) + 10;
-    var left = this.renderY(context, padding, width, height, yNum, min, stepY, yLineNum, stepY2, fontSize, stepV, bottom);
+    var bottom = padding[2] + lineHeight * (this.option.yOutline ? 1.5 : 1) + ylp;
+    var left = this.renderY(context, padding, width, height, yNum, min, stepY, yLineNum, stepY2, fontSize, stepV, bottom, xlp, ylp);
 
     var offsetX1 = context.measureText(this.data.label[0]).width >> 1;
     var offsetX2 = context.measureText(this.data.label[this.data.label.length - 1]).width >> 1;
@@ -233,11 +236,11 @@ function getGdr(context, top, y, fill) {
     var increase = (this.data.label.length - 1) / (xNum - 1);
     var increase2 = (this.data.label.length - 1) / (xLineNum - 1);
 
-    this.renderX(context, padding, height, lineHeight, left, width - padding[1] - padding[3], xNum, stepX, increase, xLineNum, increase2);
+    this.renderX(context, padding, height, lineHeight, left, width - padding[1], xNum, stepX, increase, xLineNum, increase2, xlp, ylp);
 
     return [left, bottom, stepX, stepY];
   }
-  Line.prototype.renderY = function(context, padding, width, height, yNum, min, stepY, yLineNum, stepY2, fontSize, stepV, bottom) {
+  Line.prototype.renderY = function(context, padding, width, height, yNum, min, stepY, yLineNum, stepY2, fontSize, stepV, bottom, xlp, ylp) {
     var left = 0;
     var x = padding[3];
     var fixed = parseInt(this.option.fixed) || 0;
@@ -281,7 +284,7 @@ function getGdr(context, top, y, fill) {
       coords.push([x + left - (w >> 1), y]);
     }
 
-    left += 10 + x;
+    left += xlp + x;
     if(this.option.xLine) {
       context.setLineDash && context.setLineDash(this.option.xLineDash || [width, 0]);
       this.gridOnAreaY = [];
@@ -301,7 +304,7 @@ function getGdr(context, top, y, fill) {
 
     return left;
   }
-  Line.prototype.renderX = function(context, padding, height, lineHeight, left, right, xNum, stepX, increase, xLineNum, increase2) {
+  Line.prototype.renderX = function(context, padding, height, lineHeight, left, right, xNum, stepX, increase, xLineNum, increase2, xlp, ylp) {
     var self = this;
     var coords = self.xCoords = [];
     context.setLineDash && context.setLineDash(self.option.yLineDash || [1, 0]);
@@ -314,12 +317,12 @@ function getGdr(context, top, y, fill) {
         if(self.option.yLine) {
           self.gridOnAreaX = self.gridOnAreaX || [];
           if(self.option.gridOnArea) {
-            self.gridOnAreaX.push([x, padding[0], x, y - 10]);
+            self.gridOnAreaX.push([x, padding[0], x, y - ylp]);
           }
           else {
             context.beginPath();
             context.moveTo(x, padding[0]);
-            context.lineTo(x, y - 10);
+            context.lineTo(x, y - ylp);
             context.stroke();
           }
         }
@@ -341,23 +344,23 @@ function getGdr(context, top, y, fill) {
         for(var i = 0; i < xLineNum - 1; i++) {
           var x = Math.round(left + i * stepX * Math.floor(increase2));
           if(self.option.gridOnArea) {
-            self.gridOnAreaX.push([x, padding[0], x, y - 10]);
+            self.gridOnAreaX.push([x, padding[0], x, y - ylp]);
           }
           else {
             context.beginPath();
             context.moveTo(x, padding[0]);
-            context.lineTo(x, y - 10);
+            context.lineTo(x, y - ylp);
             context.stroke();
           }
         }
         if(self.option.gridOnArea) {
-          self.gridOnAreaX.push([right, padding[0], right, y - 10]);
+          self.gridOnAreaX.push([right, padding[0], right, y - ylp]);
         }
         else {
           context.beginPath();
           var x = self.data.label.length > 1 ? right : left;
           context.moveTo(x, padding[0]);
-          context.lineTo(x, y - 10);
+          context.lineTo(x, y - ylp);
           context.stroke();
         }
       }
