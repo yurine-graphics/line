@@ -28,7 +28,7 @@ npm install yurine-line
      - padding:int/Array 边距，上右下左，单位px，默认10
      - width:int 宽度，单位px
      - height:int 高度，单位px
-     - lineWidth:int 绘线粗细，单位px，∈\[1, 可视半径]
+     - lineWidth:int/Array 绘线粗细，单位px，∈\[1, 可视半径]
      - gridColor:String 背景网格线颜色
      - xLineDash:Array\<int> x线虚线类型
      - yLineDash:Array\<int> y线虚线类型
@@ -53,7 +53,7 @@ npm install yurine-line
      - xOutline:Boolean 横线是否出头
      - yOutline:Boolean 纵线是否出头
      - gridOnArea:Boolean 背景网格线显示在area上
-     - breakLineWidth:int 断格绘线粗细，单位px，∈\[1, 可视半径]
+     - breakLineWidth:int/Array 断格绘线粗细，单位px，∈\[1, 可视半径]
      - breakColor:String 断格绘线颜色
      - breakDash:Array\<int> 断格绘线虚线类型，特别的对于末尾，null标识需要断格绘线，undefined标识空白
      - breakStart:int 断格绘线开始绘制索引，超过将不绘，默认0忽略
