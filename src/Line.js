@@ -282,8 +282,8 @@ class Line {
     }
 
     left += 10 + x;
-    if(this.option.yLine) {
-      context.setLineDash && context.setLineDash(this.option.yLineDash || [width, 0]);
+    if(this.option.xLine) {
+      context.setLineDash && context.setLineDash(this.option.xLineDash || [width, 0]);
       this.gridOnAreaY = [];
       for(var i = 0; i < yLineNum; i++) {
         var y = Math.round(height - stepY2 * i - bottom);
@@ -304,14 +304,14 @@ class Line {
   renderX(context, padding, height, lineHeight, left, right, xNum, stepX, increase, xLineNum, increase2) {
     var self = this;
     var coords = self.xCoords = [];
-    context.setLineDash && context.setLineDash(self.option.xLineDash || [1, 0]);
+    context.setLineDash && context.setLineDash(self.option.yLineDash || [1, 0]);
     var y = height - lineHeight - padding[2];
     if(self.option.labelIndex) {
       self.option.labelIndex.forEach(function(item) {
         var x = left + item * stepX;
         self.renderXItem(self.data.label[item], context, padding, height, lineHeight, x, item == 0, item == self.data.label.length - 1);
         coords.push([x, y]);
-        if(self.option.xLine) {
+        if(self.option.yLine) {
           self.gridOnAreaX = self.gridOnAreaX || [];
           if(self.option.gridOnArea) {
             self.gridOnAreaX.push([x, padding[0], x, y - 10]);
@@ -336,7 +336,7 @@ class Line {
       var x = left + stepX * (self.data.label.length - 1);
       self.renderXItem(item, context, padding, height, lineHeight, x, i == 0, true);
       coords.push([x, y]);
-      if(self.option.xLine) {
+      if(self.option.yLine) {
         self.gridOnAreaX = [];
         for(var i = 0; i < xLineNum - 1; i++) {
           var x = Math.round(left + i * stepX * Math.floor(increase2));
@@ -667,10 +667,10 @@ class Line {
       }
 
       if(this.option.gridOnArea) {
-        if(this.option.xLine) {
+        if(this.option.yLine) {
           context.lineWidth = this.option.gridWidth;
           context.strokeStyle = this.option.gridColor;
-          context.setLineDash && context.setLineDash(this.option.xLineDash || [1, 0]);
+          context.setLineDash && context.setLineDash(this.option.yLineDash || [1, 0]);
           if(this.option.labelIndex) {
             this.gridOnAreaX.forEach(function(item) {
               context.beginPath();
@@ -689,10 +689,10 @@ class Line {
             }
           }
         }
-        if(this.option.yLine) {
+        if(this.option.xLine) {
           context.lineWidth = this.option.gridWidth;
           context.strokeStyle = this.option.gridColor;
-          context.setLineDash && context.setLineDash(this.option.yLineDash || [1, 0]);
+          context.setLineDash && context.setLineDash(this.option.xLineDash || [1, 0]);
           if(this.option.labelIndex) {
             this.gridOnAreaY.forEach(function(item) {
               context.beginPath();
@@ -842,10 +842,10 @@ class Line {
     }
 
     if(this.option.gridOnArea) {
-      if(this.option.xLine) {
+      if(this.option.yLine) {
         context.lineWidth = this.option.gridWidth;
         context.strokeStyle = this.option.gridColor;
-        context.setLineDash && context.setLineDash(this.option.xLineDash || [1, 0]);
+        context.setLineDash && context.setLineDash(this.option.yLineDash || [1, 0]);
         if(this.option.labelIndex) {
           this.gridOnAreaX.forEach(function(item) {
             context.beginPath();
@@ -864,10 +864,10 @@ class Line {
           }
         }
       }
-      if(this.option.yLine) {
+      if(this.option.xLine) {
         context.lineWidth = this.option.gridWidth;
         context.strokeStyle = this.option.gridColor;
-        context.setLineDash && context.setLineDash(this.option.yLineDash || [1, 0]);
+        context.setLineDash && context.setLineDash(this.option.xLineDash || [1, 0]);
         if(this.option.labelIndex) {
           this.gridOnAreaY.forEach(function(item) {
             context.beginPath();
