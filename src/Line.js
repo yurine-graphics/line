@@ -118,23 +118,39 @@ class Line {
       }
     }
 
-    var max = parseFloat(self.data.value[0][0]) || 0;
-    var min = parseFloat(self.data.value[0][0]) || 0;
-    self.data.value.forEach(function(item) {
-      item && item.forEach(function(item2) {
-        var v = parseFloat(item2) || 0;
-        max = Math.max(max, v);
-        min = Math.min(min, v);
-      });
-    });
+    var max = 0;
+    var min = 0;
+    var maxConfig = false;
+    var minConfig = false;
     if(self.option.max !== undefined && self.option.max !== null) {
-      max = parseFloat(self.option.max);
+      maxConfig = true;
+      max = parseFloat(self.option.max) || 0;
     }
     if(self.option.min !== undefined && self.option.min !== null) {
-      min = parseFloat(self.option.min);
+      minConfig = true;
+      min = parseFloat(self.option.min) || 0;
     }
     if(max < min) {
       max = min;
+    }
+    if(!maxConfig || !minConfig) {
+      if(!maxConfig) {
+        max = parseFloat(self.data.value[0][0]) || 0;
+      }
+      if(!minConfig) {
+        min = parseFloat(self.data.value[0][0]) || 0;
+      }
+      self.data.value.forEach(function(item) {
+        item && item.forEach(function(item2) {
+          var v = parseFloat(item2) || 0;
+          if(!maxConfig) {
+            max = Math.max(max, v);
+          }
+          if(!minConfig) {
+            min = Math.min(min, v);
+          }
+        });
+      });
     }
 
     var font = self.option.font || 'normal normal normal 12px/1.5 Arial';
