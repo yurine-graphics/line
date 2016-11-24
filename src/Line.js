@@ -225,7 +225,7 @@ class Line {
     if(yNum == 1) {
       stepV = stepY >> 1;
     }
-    self.renderFg(context, height, lineHeight, lineWidth, breakLineWidth, left, bottom, padding[0], width - padding[3] - padding[1], stepX, stepY, stepV, min, xLineNum, yLineNum);
+    self.renderFg(context, height, lineHeight, lineWidth, breakLineWidth, left, bottom, padding[0], width - padding[3], stepX, stepY, stepV, min, xLineNum, yLineNum);
   }
   renderBg(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV, xLineNum, yLineNum, xlp, ylp) {
     var color = preColor(this.option.color || '#000');

@@ -255,7 +255,7 @@
       label: data.map(function(item){return item.dataTime}),
       value: [
         data.map(function(item) {return item.profitValue}),
-        data.map(function(item) {return Math.random() * 10})
+        [1,2,3,4]
       ]
     };
     search.styles = search.styles || ['curve', 'straight'];
@@ -302,7 +302,7 @@
       xLine: true,
       yLine: true,
       fixed: 2,
-      breakEnd: 6,
+//      breakEnd: 6,
       breakStart: 0,
       percent: true,
       xlp: 10,
