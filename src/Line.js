@@ -18,9 +18,16 @@ function getCtrol(x0, y0, x1, y1, x2, y2, x3, y3) {
 }
 
 function getTop(coords) {
-  var top = coords[0][1];
+  var top = null;
   coords.forEach(function(item) {
-    top = Math.min(top, item[1]);
+    if(item) {
+      if(top !== null) {
+        top = Math.min(top, item[1]);
+      }
+      else {
+        top = item[1];
+      }
+    }
   });
   return top;
 }
@@ -856,7 +863,7 @@ class Line {
         context.moveTo(last[0], last[1]);
         context.strokeStyle = breakColor;
         context.lineWidth = breakLineWidth;
-        context.setLineDash && context.setLineDash(breakDash);
+        context.setLineDash && context.setLineDash(breakDash);console.log(this.option.breakEnd)
         if(!this.option.breakEnd || this.option.breakEnd <= 0) {
           context.lineTo(right, last[1]);
         }
