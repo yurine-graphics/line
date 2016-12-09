@@ -258,7 +258,7 @@
         data.map(function() {return Math.random() * 10}).slice(0, 20)
       ]
     };
-    search.styles = search.styles || ['straight', 'straight'];
+    search.styles = search.styles || ['curve', 'straight'];
     search.discRadio = search.discRadio || 3;
     search.xNum = search.xNum || 4;
     search.yNum = search.yNum || 5;
@@ -302,6 +302,8 @@
       xLine: true,
       yLine: true,
       fixed: 2,
+      breakEnd: 6,
+      breakStart: 0,
       percent: true,
       xlp: 10,
       ylp: 10

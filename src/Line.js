@@ -438,7 +438,7 @@ class Line {
         return;
       }
       if(item.length == 1) {
-        self.renderOne(context, item[0], lineHeight, color);
+        self.renderOne(context, item[0], lineHeight, color, i);
         return;
       }
       var style = self.option.styles[i];
@@ -447,17 +447,19 @@ class Line {
       self.renderLine(context, item, i, lw, bw, lineHeight, color, breakColor, breakDash, style, height - bottom, top, left, right, xLineNum, yLineNum);
     });
   }
-  renderOne(context, item, lineHeight, color) {
+  renderOne(context, item, lineHeight, color, index) {
     var self = this;
     if(self.option.discRadio) {
-      var discRadio = parseInt(self.option.discRadio) || 1;
-      discRadio = Math.max(discRadio, 1);
-      discRadio = Math.min(discRadio, lineHeight >> 1);
-      context.fillStyle = color;
-      context.beginPath();
-      context.arc(item[0], item[1], discRadio, 0, (Math.PI/180)*360);
-      context.fill();
-      context.closePath();
+      var discRadio = Array.isArray(self.option.discRadio) ? parseInt(self.option.discRadio[index]) : parseInt(self.option.discRadio);
+      if(discRadio) {
+        discRadio = Math.max(discRadio, 1);
+        discRadio = Math.min(discRadio, lineHeight >> 1);
+        context.fillStyle = color;
+        context.beginPath();
+        context.arc(item[0], item[1], discRadio, 0, (Math.PI / 180) * 360);
+        context.fill();
+        context.closePath();
+      }
     }
   }
   renderLine(context, coords, index, lineWidth, breakLineWidth, lineHeight, color, breakColor, breakDash, style, y, y0, left, right, xLineNum, yLineNum) {
@@ -471,19 +473,20 @@ class Line {
         break;
     }
     if(self.option.discRadio) {
-      var discRadio = parseInt(self.option.discRadio) || 1;
-      discRadio = Math.max(discRadio, 1);
-      discRadio = Math.min(discRadio, lineHeight >> 1);
-      coords.forEach(function(item) {
-        if(item === null || item === undefined) {
-          return;
-        }
-        context.fillStyle = color;
-        context.beginPath();
-        context.arc(item[0], item[1], discRadio, 0, (Math.PI/180)*360);
-        context.fill();
-        context.closePath();
-      });
+      var discRadio = Array.isArray(self.option.discRadio) ? parseInt(self.option.discRadio[index]) : parseInt(self.option.discRadio);
+      if(discRadio) {
+        discRadio = Math.max(discRadio, 1);
+        coords.forEach(function(item) {
+          if (item === null || item === undefined) {
+            return;
+          }
+          context.fillStyle = color;
+          context.beginPath();
+          context.arc(item[0], item[1], discRadio, 0, (Math.PI / 180) * 360);
+          context.fill();
+          context.closePath();
+        });
+      }
     }
   }
   renderCurve(context, coords, index, y, y0, left, right, color, lineWidth, breakLineWidth, breakColor, breakDash, xLineNum, yLineNum) {
@@ -690,7 +693,7 @@ class Line {
         context.strokeStyle = breakColor;
         context.lineWidth = breakLineWidth;
         context.setLineDash && context.setLineDash(breakDash);
-        if(!this.option.breakEnd || this.option.breakEnd <= 0) {
+        if(this.option.breakEnd === undefined || this.option.breakEnd === null || this.option.breakEnd < 0) {
           context.lineTo(right, last[1]);
         }
         else {
@@ -863,8 +866,8 @@ class Line {
         context.moveTo(last[0], last[1]);
         context.strokeStyle = breakColor;
         context.lineWidth = breakLineWidth;
-        context.setLineDash && context.setLineDash(breakDash);console.log(this.option.breakEnd)
-        if(!this.option.breakEnd || this.option.breakEnd <= 0) {
+        context.setLineDash && context.setLineDash(breakDash);
+        if(this.option.breakEnd === undefined || this.option.breakEnd === null || this.option.breakEnd < 0) {
           context.lineTo(right, last[1]);
         }
         else {
