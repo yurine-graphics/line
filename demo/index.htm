@@ -279,6 +279,8 @@
       e.preventDefault();
       cb();
     });
+    search.data.label = [1,2,3,4,5,6]
+    search.data.value = [[1,2,3,4,5,6], [null, null, null, null]]
     var colors = ['FD8964', '72D572', 'FFC107', '8C9EFF', '9056EB'];
     var l = new Line('#canvas', search.data, {
 //      width: 580,
@@ -302,8 +304,8 @@
       xLine: true,
       yLine: true,
       fixed: 2,
-      breakEnd: 6,
-      breakStart: 0,
+      breakEnd: 4,
+      breakStart: 1,
       percent: true,
       xlp: 10,
       ylp: 10
