@@ -61,6 +61,7 @@ npm install yurine-line
      - labelIndex:Array\<int> 指明显示哪些坐标的索引，默认为空按计算逻辑
      - xlp:int=0 x轴原点和y标签的距离
      - ylp:int=0 y轴原点和x标签的距离
+     - minYLabelWidth:int=0 y轴标签最小宽度
  * getCoords():Array\<Array> 获取绘制点的坐标，是个二维数组，包含所有线条
  * getCoord(index:int):Array\<Array\<x:Number, y:Number>> 获取第index线条的所有坐标，-1从末尾起
  * getPoint(index:int, j:int):Array\<x:Number, y:Number> 获取第index线条的第j点的纵坐标，-1从末尾起

@@ -279,6 +279,7 @@ class Line {
     var vs = [];
     var ws = [];
     var v;
+    var minYLabelWidth = parseInt(this.option.minYLabelWidth) || 0;
     for(var i = 0; i < yNum; i++) {
       if(this.option.format) {
         v = this.option.format((min + i * stepV).toFixed(fixed));
@@ -289,7 +290,7 @@ class Line {
       vs.push(v);
       var w = context.measureText(v).width;
       ws.push(w);
-      left = Math.max(left, w);
+      left = Math.max(left, Math.max(minYLabelWidth, w));
     }
     for(var i = 0; i < yNum; i++) {
       var y;
