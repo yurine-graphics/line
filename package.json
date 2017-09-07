@@ -1,6 +1,6 @@
 {
   "name": "yurine-line",
-  "version": "0.14.0",
+  "version": "0.15.1",
   "description": "线图",
   "maintainers": [
     {
@@ -21,7 +21,7 @@
   "author": "army8735",
   "license": "MIT",
   "devDependencies": {
-    "jsdc": "~0.6.9",
+    "jsdc": "~0.6.13",
     "gulp": "~3.9.1",
     "gulp-rename": "~1.2.2",
     "gulp-rimraf": "^0.1.1",

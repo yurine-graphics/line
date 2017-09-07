@@ -625,8 +625,11 @@ class Line {
             else if(rightC) {
               context.quadraticCurveTo(rightC[0], rightC[1], coords[i][0], coords[i][1]);
             }
-            else {
+            else if(leftC) {
               context.quadraticCurveTo(leftC[2], leftC[3], coords[i][0], coords[i][1]);
+            }
+            else {
+              context.lineTo(coords[i][0], coords[i][1]);
             }
           }
           isPrevBreak = false;

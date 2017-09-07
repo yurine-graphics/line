@@ -258,7 +258,7 @@
         data.map(function() {return Math.random() * 10}).slice(0, 20)
       ]
     };
-    search.styles = search.styles || ['curve', 'straight'];
+    search.styles = search.styles || ['curve', 'curve'];
     search.discRadio = search.discRadio || 3;
     search.xNum = search.xNum || 4;
     search.yNum = search.yNum || 5;
@@ -279,8 +279,8 @@
       e.preventDefault();
       cb();
     });
-    search.data.label = [1,2,3,4,5,6]
-    search.data.value = [[1,2,3,4,5,6], [null, null, null, null]]
+    search.data.label = [1,2,3,4,5,6,7]
+    search.data.value = [[1,2,null,4,5,6]]
     var colors = ['FD8964', '72D572', 'FFC107', '8C9EFF', '9056EB'];
     var l = new Line('#canvas', search.data, {
 //      width: 580,
@@ -289,7 +289,7 @@
       lineWidth: [search.lineWidth, 2],
       styles: search.styles,
       curvature: search.curvature,
-      xNum: 3,
+      xNum: 7,
       yNum: 5,
       xLineNum: 5,
       max: 12.62,
@@ -302,10 +302,10 @@
       gridWidth: 1,
       gridColor: 'rgba(111,111,111,1)',
       xLine: true,
-      yLine: true,
+      yLine: false,
       fixed: 2,
       breakEnd: 4,
-      breakStart: 1,
+//      breakStart: 1,
       percent: true,
       xlp: 10,
       ylp: 10,
