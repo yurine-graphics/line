@@ -62,6 +62,7 @@ npm install yurine-line
      - xlp:int=0 x轴原点和y标签的距离
      - ylp:int=0 y轴原点和x标签的距离
      - minYLabelWidth:int=0 y轴标签最小宽度
+     - ySplit:Number y轴分割的值。当有填充色时：不设置则填充色向下填到x轴；设置时大于此值的填到此值的横线，小于此值反向填到此值的横线
  * getCoords():Array\<Array> 获取绘制点的坐标，是个二维数组，包含所有线条
  * getCoord(index:int):Array\<Array\<x:Number, y:Number>> 获取第index线条的所有坐标，-1从末尾起
  * getPoint(index:int, j:int):Array\<x:Number, y:Number> 获取第index线条的第j点的纵坐标，-1从末尾起

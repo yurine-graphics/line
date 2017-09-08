@@ -31,12 +31,48 @@ function getTop(coords) {
   });
   return top;
 }
+function getBot(coords) {
+  var bot = null;
+  coords.forEach(function(item) {
+    if(item) {
+      if(bot !== null) {
+        bot = Math.max(bot, item[1]);
+      }
+      else {
+        bot = item[1];
+      }
+    }
+  });
+  return bot;
+}
 
 function preColor(color) {
   if(color.charAt(0) != '#' && color.charAt(0) != 'r') {
     return '#' + color;
   }
   return color;
+}
+
+function merge(context, data1, data2, cb) {
+  var img = new Image();
+  img.onload = function() {
+    context.drawImage(img, 0, 0);
+    img = new Image();
+    img.onload = function() {
+      context.drawImage(img, 0, 0);
+      cb();
+    };
+    img.src = data2;
+  };
+  img.src = data1;
+}
+function drawImg(context, data, cb) {
+  var img = new Image();
+  img.onload = function() {
+    context.drawImage(img, 0, 0);
+    cb && cb();
+  };
+  img.src = data;
 }
 
 function getGdr(context, top, y, fill) {
@@ -99,8 +135,6 @@ class Line {
     else {
       padding = [padding, padding, padding, padding];
     }
-    var paddingX = padding[1] + padding[3];
-    var paddingY = padding[0] + padding[2];
 
     var lineWidth;
     if(Array.isArray(self.option.lineWidth)) {
@@ -232,7 +266,7 @@ class Line {
     if(yNum == 1) {
       stepV = stepY >> 1;
     }
-    self.renderFg(context, height, lineHeight, lineWidth, breakLineWidth, left, bottom, padding[0], width - padding[3], stepX, stepY, stepV, min, xLineNum, yLineNum);
+    self.renderFg(context, height, lineHeight, lineWidth, breakLineWidth, left, bottom, padding[0], width - padding[3], stepX, stepY, stepV, max, min, xLineNum, yLineNum, width, height);
   }
   renderBg(context, padding, width, height, gridWidth, min, lineHeight, fontSize, xNum, yNum, stepV, xLineNum, yLineNum, xlp, ylp) {
     var color = preColor(this.option.color || '#000');
@@ -414,7 +448,7 @@ class Line {
     }
     return w;
   }
-  renderFg(context, height, lineHeight, lineWidth, breakLineWidth, left, bottom, top, right, stepX, stepY, stepV, min, xLineNum, yLineNum) {
+  renderFg(context, height, lineHeight, lineWidth, breakLineWidth, left, bottom, top, right, stepX, stepY, stepV, max, min, xLineNum, yLineNum, width, height) {
     var self = this;
     context.setLineDash && context.setLineDash([1, 0]);
     var coords = this.coords = [];
@@ -433,7 +467,12 @@ class Line {
     });
     var breakColor = preColor(self.option.breakColor || '#000');
     var breakDash = self.option.breakDash || [4, 4];
-    coords.forEach(function(item, i) {
+    var ySplit = self.option.ySplit;
+    if(!isNaN(ySplit)) {
+      var bg = context.getImageData(0, 0, width, height);
+      context.clearRect(0, 0, width, height);
+    }
+    coords.forEach(function (item, i) {
       var color = getColor(self.option, i);
       if(!item.length) {
         return;
@@ -447,6 +486,47 @@ class Line {
       var bw = Array.isArray(breakLineWidth) ? breakLineWidth[i] : breakLineWidth;
       self.renderLine(context, item, i, lw, bw, lineHeight, color, breakColor, breakDash, style, height - bottom, top, left, right, xLineNum, yLineNum);
     });
+    if(!isNaN(ySplit)) {
+      var l = Math.abs(max - min);
+      var p = Math.abs(max - ySplit) / l;
+      var y = top + p * (height - bottom - top);
+      context.globalCompositeOperation = 'destination-in';
+      context.beginPath();
+      context.fillStyle = 'green';
+      context.rect(0, 0, width, y);
+      context.fill();
+      var tHalf = self.dom.toDataURL('image/png');
+      context.clearRect(0, 0, width, height);
+
+      context.globalCompositeOperation = 'source-over';
+      coords.forEach(function (item, i) {
+        var color = getColor(self.option, i);
+        if(!item.length) {
+          return;
+        }
+        if(item.length == 1) {
+          self.renderOne(context, item[0], lineHeight, color, i);
+          return;
+        }
+        var style = self.option.styles[i];
+        var lw = Array.isArray(lineWidth) ? lineWidth[i] : lineWidth;
+        var bw = Array.isArray(breakLineWidth) ? breakLineWidth[i] : breakLineWidth;
+        self.renderLine(context, item, i, lw, bw, lineHeight, color, breakColor, breakDash, style, height - bottom, top, left, right, xLineNum, yLineNum, true);
+      });
+      context.globalCompositeOperation = 'destination-in';
+      context.beginPath();
+      context.fillStyle = 'green';
+      context.rect(0, y, width, height - y);
+      context.fill();
+      var bHalf = self.dom.toDataURL('image/png');
+      context.clearRect(0, 0, width, height);
+
+      context.globalCompositeOperation = 'source-over';
+      context.putImageData(bg, 0, 0);
+      drawImg(context, tHalf, function() {
+        drawImg(context, bHalf);
+      });
+    }
   }
   renderOne(context, item, lineHeight, color, index) {
     var self = this;
@@ -463,14 +543,14 @@ class Line {
       }
     }
   }
-  renderLine(context, coords, index, lineWidth, breakLineWidth, lineHeight, color, breakColor, breakDash, style, y, y0, left, right, xLineNum, yLineNum) {
+  renderLine(context, coords, index, lineWidth, breakLineWidth, lineHeight, color, breakColor, breakDash, style, y, y0, left, right, xLineNum, yLineNum, reverse) {
     var self = this;
     switch(style) {
       case 'curve':
-        self.renderCurve(context, coords, index, y, y0, left, right, color, lineWidth, breakLineWidth, breakColor, breakDash, xLineNum, yLineNum);
+        self.renderCurve(context, coords, index, y, y0, left, right, color, lineWidth, breakLineWidth, breakColor, breakDash, xLineNum, yLineNum, reverse);
         break;
       default:
-        self.renderStraight(context, coords, index, y, left, right, color, lineWidth, breakLineWidth, breakColor, breakDash, xLineNum, yLineNum);
+        self.renderStraight(context, coords, index, y, y0, left, right, color, lineWidth, breakLineWidth, breakColor, breakDash, xLineNum, yLineNum, reverse);
         break;
     }
     if(self.option.discRadio) {
@@ -490,7 +570,7 @@ class Line {
       }
     }
   }
-  renderCurve(context, coords, index, y, y0, left, right, color, lineWidth, breakLineWidth, breakColor, breakDash, xLineNum, yLineNum) {
+  renderCurve(context, coords, index, y, y0, left, right, color, lineWidth, breakLineWidth, breakColor, breakDash, xLineNum, yLineNum, reverse) {
     if(coords.length) {
       var clone = [];
       coords.forEach(function(item) {
@@ -507,7 +587,7 @@ class Line {
           (item1[0] + item2[0]) >> 1,
           (item1[1] + item2[1]) >> 1
         ]);
-        var o = centers[centers.length - 1];
+        // var o = centers[centers.length - 1];
         // context.fillStyle = '#FF9900';
         // context.beginPath();
         // context.arc(o[0], o[1], 6, 0, 360);
@@ -566,7 +646,12 @@ class Line {
         fill = null;
       }
       if(Array.isArray(fill)) {
-        context.fillStyle = getGdr(context, getTop(coords), y, fill);
+        if(reverse) {
+          context.fillStyle = getGdr(context, getBot(coords), y0, fill);
+        }
+        else {
+          context.fillStyle = getGdr(context, getTop(coords), y, fill);
+        }
       }
       else if(fill) {
         context.fillStyle = preColor(fill);
@@ -637,8 +722,14 @@ class Line {
         else {
           context.stroke();
           if(fill && last != begin) {
-            context.lineTo(last[0], y);
-            context.lineTo(begin[0], y);
+            if(reverse) {
+              context.lineTo(last[0], y0);
+              context.lineTo(begin[0], y0);
+            }
+            else {
+              context.lineTo(last[0], y);
+              context.lineTo(begin[0], y);
+            }
             context.lineTo(begin[0], begin[1]);
             context.fill();
             begin = last;
@@ -688,8 +779,14 @@ class Line {
           }
           context.stroke();
           if(fill && last != begin) {
-            context.lineTo(last[0], y);
-            context.lineTo(begin[0], y);
+            if(reverse) {
+              context.lineTo(last[0], y0);
+              context.lineTo(begin[0], y0);
+            }
+            else {
+              context.lineTo(last[0], y);
+              context.lineTo(begin[0], y);
+            }
             context.lineTo(begin[0], begin[1]);
             context.fill();
           }
@@ -699,8 +796,14 @@ class Line {
       else {
         context.stroke();
         if(fill && last != begin) {
-          context.lineTo(last[0], y);
-          context.lineTo(begin[0], y);
+          if(reverse) {
+            context.lineTo(last[0], y0);
+            context.lineTo(begin[0], y0);
+          }
+          else {
+            context.lineTo(last[0], y);
+            context.lineTo(begin[0], y);
+          }
           context.lineTo(begin[0], begin[1]);
           context.fill();
         }
@@ -769,14 +872,19 @@ class Line {
       }
     }
   }
-  renderStraight(context, coords, index, y, left, right, color, lineWidth, breakLineWidth, breakColor, breakDash, xLineNum, yLineNum) {
+  renderStraight(context, coords, index, y, y0, left, right, color, lineWidth, breakLineWidth, breakColor, breakDash, xLineNum, yLineNum, reverse) {
     context.beginPath();
     var fill = this.option.areaColors[index];
     if(fill == 'transparent') {
       fill = null;
     }
     if(Array.isArray(fill)) {
-      context.fillStyle = getGdr(context, getTop(coords), y, fill);
+      if(reverse) {
+        context.fillStyle = getGdr(context, getBot(coords), y0, fill);
+      }
+      else {
+        context.fillStyle = getGdr(context, getTop(coords), y, fill);
+      }
     }
     else if(fill) {
       context.fillStyle = preColor(fill);
@@ -830,8 +938,14 @@ class Line {
         else {
           context.stroke();
           if(fill && last != begin) {
-            context.lineTo(last[0], y);
-            context.lineTo(begin[0], y);
+            if(reverse) {
+              context.lineTo(last[0], y0);
+              context.lineTo(begin[0], y0);
+            }
+            else {
+              context.lineTo(last[0], y);
+              context.lineTo(begin[0], y);
+            }
             context.lineTo(begin[0], begin[1]);
             context.fill();
             begin = last;
@@ -871,8 +985,14 @@ class Line {
           context.lineTo(coords[i][0], coords[i][1]);
           context.stroke();
           if(fill && last != begin) {
-            context.lineTo(last[0], y);
-            context.lineTo(begin[0], y);
+            if(reverse) {
+              context.lineTo(last[0], y0);
+              context.lineTo(begin[0], y0);
+            }
+            else {
+              context.lineTo(last[0], y);
+              context.lineTo(begin[0], y);
+            }
             context.lineTo(begin[0], begin[1]);
             context.fill();
           }
@@ -882,8 +1002,14 @@ class Line {
       else {
         context.stroke();
         if(fill && last != begin) {
-          context.lineTo(last[0], y);
-          context.lineTo(begin[0], y);
+          if(reverse) {
+            context.lineTo(last[0], y0);
+            context.lineTo(begin[0], y0);
+          }
+          else {
+            context.lineTo(last[0], y);
+            context.lineTo(begin[0], y);
+          }
           context.lineTo(begin[0], begin[1]);
           context.fill();
         }
